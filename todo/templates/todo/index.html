@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Calibri, Helvetica, sans-serif;
-            margin: 0;
         }
 
         ul {
@@ -12,431 +17,479 @@
             padding-left: 0;
         }
 
-        .topbar {
-            overflow: hidden;
-            background-color: #0fa662;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1;
-        }
+        /* Topbar styles */
+.topbar {
+    background-color: #1458a0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .topbar a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding-left: 15px;
-            text-decoration: none;
-            font-size: 25px;
-            padding: 10px;
-        }
+/* Styling for links in the topbar */
+.topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    margin-right: 20px;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
 
-        /* Change the color of links on hover */
-        .topbar li a.tabs:hover {
-          color: #ccc;
-        }
+/* Links hover effect */
+.topbar a:hover {
+    color: #ccc;
+    background-color: rgba(255, 255, 255, 0.2);
+}
 
-        .topbar ul {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            display: inline-block;
-        }
+/* Flexbox for horizontal alignment */
+.topbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
 
-        .topbar ul li {
-            display: inline-block;
-            color: #f2f2f2;
-            text-align: center;
-        }
+/* Style for each list item */
+.topbar ul li {
+    margin: 0 15px;
+}
 
-        .sidenav {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #eee;
-            overflow-x: hidden;
-            padding-top: 15px;
-            margin: 0;
-            margin-top: 49px;
-        }
+/* Responsiveness: adjust padding and font size for smaller screens */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 10px 15px;
+    }
+    
+    .topbar a {
+        font-size: 18px;
+        margin-right: 10px;
+    }
+    
+    .topbar ul li {
+        margin: 0 10px;
+    }
+}
 
-        .sidenav li:hover {
-          background: #ddd;
-        }
+/* Further responsiveness for very small devices */
+@media (max-width: 480px) {
+    .topbar a {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .topbar ul li {
+        margin: 0 8px;
+    }
+}
 
-        .sidenav a {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
+        
+/* Sidebar (sidenav) styles */
+.sidenav {
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #babadf;
+    padding-top: 20px; /* Enough padding to clear the topbar height */
+    margin-top: 60px; /* Adjusted to match the topbar height */
+    padding-left: 10px;
+    overflow-x: hidden;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 99; /* Make sure the sidebar is below the topbar */
+    transition: width 0.3s ease;
+}
 
-        .sidenav a:hover {
-            color: #0fa662;
-        }
+/* Sidebar list items */
+.sidenav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px;
+}
 
-        .sidenav input[type=text] {
-          border:none;
-          border-radius: 10px;
-          width: 200px;
-          margin-left: 10px;
-          margin-top: 5px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
+.sidenav ul li {
+    padding: 12px 20px;
+    color: #333;
+    text-align: left;
+    font-size: 18px;
+    transition: background 0.3s ease;
+}
 
-        .sidenav div {
-          width: 220px;
-          margin-left: 10px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-        }
+/* Sidebar link styles */
+.sidenav a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    display: block;
+    padding: 10px 20px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
 
-        #listTags {
-          border:none;
-          border-radius: 10px;
-          /* width: 175px; */
-          margin-left: 10px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
+/* Sidebar hover effects */
+.sidenav a:hover {
+    background-color: #e2e2e2;
+    color: #0fa662;
+}
 
-        #newListTag{
-            border:none;
-            border-radius: 10px;
-            width: 60%;
-            margin-left: 10px;
-            padding: 10px;
-            float: left;
-            font-size: 16px;
-            box-shadow: 1px 1px 5px #555 inset;
-            white-space: nowrap;
-            display: block;
-        }
+.sidenav li:hover {
+    background-color: #ddd;
+}
 
-        .sidenav .addTodoList {
-          padding: 9px;
-          width: 17%;
-          background: #d9d9d9;
-          color: #555;
-          float: right;
-          margin-top: 5px;
-          text-align: center;
-          font-size: 16px;
-          cursor: pointer;
-          transition: 0.3s;
-          border-radius: 10px;
-          display: block;
-        }
+/* Input fields inside the sidebar */
+.sidenav input[type=text],
+.sidenav select {
+    width: 90%;
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
 
-        .sidenav .addTodoList:hover {
-          background-color: #bbb;
-        }
+/* Add button for todo lists */
+.sidenav .addTodoList {
+    padding: 12px 20px; /* Slightly larger padding for a better feel */
+    background: #0fa662;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 80%; /* Adjust width to make the button smaller */
+    margin: 30px auto; /* Centers the button horizontally */
+    display: block; /* Ensures it's treated as a block element for centering */
+}
 
-        .sidenav hr {
-            margin-top: 50px;
-            height: 2px;
-            background-color: #0fa662;
-            border: none;
-            width: 87%;
-            display: block;
-        }
+.sidenav .addTodoList:hover {
+    background-color: #04502e;
+}
 
-        .rightsidebar hr {
-            height: 2px;
-            background-color: #0fa662;
-            border: none;
-            width: 87%;
-        }
+/* Divider (hr) styling */
+.sidenav hr {
+    border: none;
+    height: 1px;
+    background-color: #0fa662;
+    margin: 30px 5%;
+}
 
-        .rightsidebar {
-            height: 100%;
-            width: 350px;
-            margin-top: 49px;
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: #eee;
-            overflow-x: hidden;
-            padding-top: 10px;
-            padding-right: 10px;
-            {#margin: 0;#}
-        }
+        /* Right Sidebar (rightsidebar) Styles */
+.rightsidebar {
+    height: 100%;
+    width: 350px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f4f4f4;
+    padding-top: 60px; /* Added padding to clear the topbar */
+    margin-top: 60px; /* Matches the height of the topbar to avoid overlap */
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    z-index: 99; /* Ensures it stacks below the topbar */
+    transition: width 0.3s ease;
+    overflow-x: hidden;
+}
 
-        .rightsidebar a {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
+/* Horizontal line (hr) styling */
+.rightsidebar hr {
+    height: 2px;
+    background-color: #0fa662;
+    border: none;
+    width: 87%;
+    margin: 10px auto;
+}
 
-        .rightsidebar form {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
+/* Right Sidebar link styles */
+.rightsidebar a {
+    padding: 10px 16px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    display: block;
+    transition: background 0.3s ease, color 0.3s ease;
+}
 
-        .rightsidebar textarea {
-            width: 325px;
-        }
+/* Sidebar hover effects */
+.rightsidebar a:hover {
+    background-color: #e2e2e2;
+    color: #0fa662;
+}
 
-        .rightsidebar .save-button {
-            padding: 9px;
-            background: #d9d9d9;
-            color: #555;
-            float: left;
-            text-align: center;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 10px;
-            display: inline-block;
-            border: 0;
-            margin-top: 10px;
-        }
+/* Form and textarea styling */
+.rightsidebar form {
+    padding: 10px 16px;
+    font-size: 18px;
+    color: #333;
+}
 
-        .rightsidebar .save-button:hover {
-          background-color: #bbb;
-        }
+.rightsidebar textarea {
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+}
 
-        .main {
-            margin-left: 250px; /* Same as the width of the sidenav */
-            margin-right: 350px; /* Same as the width of the sidenav */
-            font-size: 20px;
-            padding: 0px 20px;
-            margin-top: 70px;
-        }
+/* Save button styling */
+.rightsidebar .save-button {
+    padding: 10px 15px;
+    background: #0fa662;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
 
-        .main h2 a {
-            text-decoration: none;
-            color: #0fa662;
-            display: block;
-            padding-left: 5px;
-        }
+.rightsidebar .save-button:hover {
+    background-color: #0b8f54;
+}
 
-        #noListYet {
-            text-decoration: none;
-            color: #0fa662;
-            display: block;
-            align-items: center;
-        }
+      /* Main content area styling */
+.main {
+    margin-left: 400px; /* Adjusted margin-left to match the width of the left sidebar */
+    margin-right: 350px; /* Right margin for right sidebar */
+    padding: 20px;
+    font-size: 20px;
+    margin-top: 70px; /* Top margin to ensure it doesn't overlap with the topbar */
+    background-color: #fff;
+    transition: margin 0.3s ease;
+}
 
+/* Links inside the main content */
+.main h2 a {
+    text-decoration: none;
+    color: #0fa662;
+    display: block;
+    padding-left: 5px;
+    transition: color 0.3s ease;
+}
 
-        /* Include the padding and border in an element's total width and height */
-        .main * {
-          box-sizing: border-box;
-        }
+.main h2 a:hover {
+    color: #0b8f54;
+}
 
-        /* Remove margins and padding from the list */
-        .main ul {
-          margin: 0;
-          padding: 0;
-        }
+/* Message when no lists are available */
+#noListYet {
+    text-decoration: none;
+    color: #0fa662;
+    display: block;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: 500;
+}
 
-        /* Style the list items */
-        .main ul li {
-          cursor: pointer;
-          position: relative;
-          padding: 12px 8px 12px 40px;
-          list-style-type: none;
-          background: #f9f9f9;
-          font-size: 18px;
-          transition: 0.2s;
-          border-radius: 10px; /* does rounded edges on list items */
+/* Ensures that all children of .main adhere to the box-sizing rule */
+.main * {
+    box-sizing: border-box;
+}
 
-          /* make the list items unselectable */
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
+/* Removes padding and margins from unordered lists */
+.main ul {
+    margin: 0;
+    padding: 0;
+}
 
-        /* Darker background-color on hover */
-        .main ul li:hover {
-          background: #ddd;
-        }
+/* Styling for list items */
+.main ul li {
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    list-style-type: none;
+    background: #f9f9f9;
+    font-size: 18px;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+    margin-bottom: 10px; /* Adds space between list items */
+    cursor: pointer;
+    user-select: none;
+}
 
-        .main ul li.done {
-          background: #3d3939;
-          color: #fff;
-          text-decoration: line-through;
-        }
+/* Hover effect for list items */
+.main ul li:hover {
+    background: #ddd;
+}
 
-        /* Style the close button */
-        .main .close {
-          position: absolute;
-          right: 0;
-          top: 0;
-          padding: 12px 16px 12px 16px;
-          border-radius: 10px;
-        }
+/* Completed task style */
+.main ul li.done {
+    background: #3d3939;
+    color: #fff;
+    text-decoration: line-through;
+}
 
-        .main .close:hover {
-          background-color: #f44336;
-          color: white;
-        }
+/* Close button for each list item */
+.main .close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
 
-        /* Style the header */
-        .main .header {
-          /* color: white; */
-          color: black;
-          display: block;
-        }
+.main .close:hover {
+    background-color: #f44336;
+    color: white;
+}
 
-        /* Clear floats after the header */
-        .main .header:after {
-          content: "";
-          display: table;
-          clear: both;
-        }
+/* Header styling */
+.main .header {
+    color: black;
+    display: block;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
 
-        /* Style the input text*/
-        .main input[type=text] {
-          border: none;
-          border-radius: 10px;
-          width: 75%;
-          padding: 10px;
-          /* float: left; */
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
+/* Ensures clear floats after header */
+.main .header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
 
-        /* Style the input date*/
-        .main input[type=date] {
-          border: none;
-          border-radius: 10px;
-          width: 75%;
-          padding: 10px;
-          /* float: left; */
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
-	
-	    /* Style the input color*/
-        .main input[type=color] {
-          display: block;
-          margin-bottom: 5px;
-        }
+/* Input field for text */
+.main input[type=text] {
+    border: none;
+    border-radius: 10px;
+    width: 75%;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: inset 1px 1px 5px #555;
+    margin-bottom: 10px;
+}
 
-        /* Style the input checkbox within unordered list item */
-        .main ul li input[type=checkbox] {
-          position: absolute;
-          left: 2px;
-          top: 12px;
-          width: 20px;
-          height: 20px;
-          padding: 12px 16px 12px 16px;
-          border-radius: 10px;
-        }
+/* Input field for date */
+.main input[type=date] {
+    border: none;
+    border-radius: 10px;
+    width: 75%;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: inset 1px 1px 5px #555;
+    margin-bottom: 10px;
+}
 
-        /* Style the "Add" button */
-        .main .addBtn {
-          padding: 9px;
-          width: 25%;
-          background: #d9d9d9;
-          color: #555;
-          float:left;
-          text-align: center;
-          font-size: 16px;
-          cursor: pointer;
-          transition: 0.3s;
-          border-radius: 10px;
-          display: block;
-        }
+/* Input field for color selection */
+.main input[type=color] {
+    display: block;
+    margin-bottom: 5px;
+}
 
-        .main .addBtn:hover {
-          background-color: #bbb;
-        }
+/* Checkbox styling within list items */
+.main ul li input[type=checkbox] {
+    position: absolute;
+    left: 10px;
+    top: 15px;
+    width: 20px;
+    height: 20px;
+}
 
-        .main .add-template-button {
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            background: #0fa662;
-            border: 0;
-            font-size: 16px;
-            height: 37px;
-            padding: 0 11px;
-            margin-top: 5px;
-            text-align: center;
-            width: 100%;
-            min-width: 200px;
-            font-weight: 500;
-            color: #f9f9f9;
-        }
-	
-	     /* Style the "customize" button */
-        .main .add-cust-color-button{
-            position: absolute;
-            right: 50px;
-            top: 0;
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            background: #0fa662;
-            color: #f9f9f9;
-            border: 0;
-            font-size: 16px;
-            height: 37px;
-            padding: 0 11px;
-            margin-top: 5px;
-            width: 10%;
-            text-align: center;
-            min-width: 100px;
-            font-weight: 300;
-        }
+/* Add button styling */
+.main .addBtn {
+    padding: 9px;
+    width: 25%;
+    background: #d9d9d9;
+    color: #555;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
 
-        .main .add-cust-color-button:hover{
-            background: #0b8f54;
-        }
+.main .addBtn:hover {
+    background-color: #bbb;
+}
 
-        .tag-template {
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            border-color: #0fa662;
-            border: 1;
-            font-size: 16px;
-            height: 40px;
-            text-align: center;
-            width: fit-content;
-            font-weight: 500;
-            color: #0fa662;
-        }
+/* Add template button styling */
+.main .add-template-button {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    background: #0fa662;
+    border: 0;
+    font-size: 16px;
+    height: 37px;
+    padding: 0 11px;
+    text-align: center;
+    width: 100%;
+    min-width: 200px;
+    font-weight: 500;
+    color: #f9f9f9;
+}
 
-        .main .add-template-button:hover{
-            background: #0b8f54;
-        }
+.main .add-template-button:hover {
+    background: #0b8f54;
+}
 
-        .add-template-button.delete:hover{
-            background: #a81a0f;
-        }
+/* Customize color button styling */
+.main .add-cust-color-button {
+    position: absolute;
+    right: 50px;
+    top: 0;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    background: #0fa662;
+    color: #f9f9f9;
+    border: 0;
+    font-size: 16px;
+    height: 37px;
+    padding: 0 11px;
+    margin-top: 5px;
+    width: 10%;
+    text-align: center;
+    min-width: 100px;
+    font-weight: 300;
+}
 
-        .shared-list {
-            color: black;
-            font-size: 12px;
-            margin-top: 5px;
-            padding-left: 5px;
-        }
+.main .add-cust-color-button:hover {
+    background: #0b8f54;
+}
+
+/* Tag template styling */
+.tag-template {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid #0fa662;
+    font-size: 16px;
+    height: 40px;
+    text-align: center;
+    width: fit-content;
+    font-weight: 500;
+    color: #0fa662;
+}
+
+/* Delete button hover effect */
+.add-template-button.delete:hover {
+    background: #a81a0f;
+}
+
+/* Shared list style */
+.shared-list {
+    color: black;
+    font-size: 12px;
+    margin-top: 5px;
+    padding-left: 5px;
+}
 
     </style>
     <meta charset="UTF-8">
@@ -460,6 +513,7 @@
 		</ul>
     </div>
     <div class="sidenav">
+        <h3>Create a new todo list</h3>
         <input type="text" id="todoListInput" placeholder="New Todo List">
         <div>Select a tag for your todo list</div>
         <select id="listTags" onchange="toggleNewTagInput()">

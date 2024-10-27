@@ -4,47 +4,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>To-Done</title>
 <style>
-    body {
-        font-family: Calibri, Helvetica, sans-serif;
-        margin: 0;
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    ul {
-        list-style: none;
-        padding-left: 0;
-    }
+        body {
+            font-family: Calibri, Helvetica, sans-serif;
+        }
 
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        /* Topbar styles */
+.topbar {
+    background-color: #1458a0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for links in the topbar */
+.topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    margin-right: 20px;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Links hover effect */
+.topbar a:hover {
+    color: #ccc;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Flexbox for horizontal alignment */
+.topbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Style for each list item */
+.topbar ul li {
+    margin: 0 15px;
+}
+
+/* Responsiveness: adjust padding and font size for smaller screens */
+@media (max-width: 768px) {
     .topbar {
-        overflow: hidden;
-        background-color: #0fa662;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1;
+        padding: 10px 15px;
     }
-
+    
     .topbar a {
-        float: left;
-        color: white;
-        text-align: center;
-        padding-left: 15px;
-        text-decoration: none;
-        font-size: 25px;
-        padding: 10px;
+        font-size: 18px;
+        margin-right: 10px;
     }
-
-    .topbar ul {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        display: inline-block;
-    }
-
+    
     .topbar ul li {
-        display: inline-block;
-        color: #f2f2f2;
-        text-align: center;
+        margin: 0 10px;
     }
+}
+
+/* Further responsiveness for very small devices */
+@media (max-width: 480px) {
+    .topbar a {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .topbar ul li {
+        margin: 0 8px;
+    }
+}
 
     h1 {
         color: #0fa662;
