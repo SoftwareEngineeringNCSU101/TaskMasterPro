@@ -183,29 +183,34 @@
     margin: 30px 5%;
 }
 
-        /* Right Sidebar (rightsidebar) Styles */
 .rightsidebar {
+    display: none; /* Hidden by default */
     height: 100%;
-    width: 350px;
+    width: 450px;
     position: fixed;
     top: 0;
     right: 0;
-    background-color: #f4f4f4;
-    padding-top: 60px; /* Added padding to clear the topbar */
-    margin-top: 60px; /* Matches the height of the topbar to avoid overlap */
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-    z-index: 99; /* Ensures it stacks below the topbar */
-    transition: width 0.3s ease;
+    background-color: #eee;
     overflow-x: hidden;
+    padding-top: 10px;
+    padding-right: 10px;
+    margin-top: 70px; /* Adjust to match the topbar height */
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 99; /* Ensure it's on top */
+    transition: width 0.3s ease;
 }
 
-/* Horizontal line (hr) styling */
+/* Right sidebar becomes visible when activated */
+.rightsidebar.visible {
+    display: block; /* Shows the sidebar */
+}
+
+/* Rest of the sidebar styles (unchanged) */
 .rightsidebar hr {
     height: 2px;
     background-color: #0fa662;
     border: none;
     width: 87%;
-    margin: 10px auto;
 }
 
 /* Right Sidebar link styles */
@@ -252,7 +257,9 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: 15px;
+    width: 80%; /* Adjust width to make the button smaller */
+    margin: 30px auto; /* Centers the button horizontally */
+    display: block; /* Ensures it's treated as a block element for centering */
 }
 
 .rightsidebar .save-button:hover {
@@ -261,8 +268,8 @@
 
       /* Main content area styling */
 .main {
-    margin-left: 400px; /* Adjusted margin-left to match the width of the left sidebar */
-    margin-right: 350px; /* Right margin for right sidebar */
+    margin-left: 300px; /* Adjusted margin-left to match the width of the left sidebar */
+    margin-right: 500px; /* Right margin for right sidebar */
     padding: 20px;
     font-size: 20px;
     margin-top: 70px; /* Top margin to ensure it doesn't overlap with the topbar */
@@ -308,15 +315,21 @@
 /* Styling for list items */
 .main ul li {
     position: relative;
-    padding: 12px 8px 12px 40px;
+    padding: 12px 20px 12px 40px; /* Spacing for the checkbox */
     list-style-type: none;
     background: #f9f9f9;
     font-size: 18px;
+    transition: background-color 0.3s ease;
     border-radius: 10px;
-    transition: background-color 0.2s ease;
-    margin-bottom: 10px; /* Adds space between list items */
-    cursor: pointer;
-    user-select: none;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Label styling */
+.main ul li label {
+    flex-grow: 1;
+    display: inline-block;
 }
 
 /* Hover effect for list items */
@@ -324,34 +337,37 @@
     background: #ddd;
 }
 
-/* Completed task style */
+/* Completed task (done) styling */
 .main ul li.done {
-    background: #3d3939;
+    background-color: #3d3939;
     color: #fff;
     text-decoration: line-through;
 }
 
 /* Close button for each list item */
-.main .close {
+.main ul li .close {
     position: absolute;
-    right: 0;
-    top: 0;
-    padding: 12px 16px;
-    border-radius: 10px;
+    right: 10px;
+    top: 10px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    color: #000;
+    background-color: transparent;
+    border: none;
+    padding: 8px;
+    transition: color 0.3s ease;
 }
 
-.main .close:hover {
-    background-color: #f44336;
-    color: white;
+.main ul li .close:hover {
+    color: #f44336;
 }
+
 
 /* Header styling */
 .main .header {
     color: black;
     display: block;
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 20px;
 }
 
@@ -392,33 +408,34 @@
 
 /* Checkbox styling within list items */
 .main ul li input[type=checkbox] {
-    position: absolute;
-    left: 10px;
-    top: 15px;
+    position: relative;
+    margin-right: 10px;
     width: 20px;
     height: 20px;
 }
 
+
 /* Add button styling */
 .main .addBtn {
     padding: 9px;
-    width: 25%;
-    background: #d9d9d9;
-    color: #555;
-    text-align: center;
+    width: 30%;
+    background: #0fa662;
+    color: #fff;
     font-size: 16px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    border-radius: 10px;
-    display: inline-block;
-    margin-bottom: 15px;
+    margin: 30px auto; /* Centers the button horizontally */
+    display: block; /* Ensures it's treated as a block element for centering */
 }
 
 .main .addBtn:hover {
     background-color: #bbb;
 }
 
-/* Add template button styling */
+/* Button styling remains the same */
 .main .add-template-button {
     display: inline-block;
     cursor: pointer;
@@ -427,17 +444,34 @@
     border: 0;
     font-size: 16px;
     height: 37px;
-    padding: 0 11px;
+    padding: 0 20px;
     text-align: center;
-    width: 100%;
-    min-width: 200px;
+    width: auto;
     font-weight: 500;
     color: #f9f9f9;
+    margin: 10px;
+}
+
+.main .add-template-button.delete {
+    background: #a81a0f;
 }
 
 .main .add-template-button:hover {
     background: #0b8f54;
 }
+
+.main .add-template-button.delete:hover {
+    background: #d11a1a;
+}
+
+/* Flex container to align forms side by side */
+.button-container {
+    display: flex;
+    justify-content: center; /* Aligns buttons at the center */
+    gap: 10px; /* Adds spacing between buttons */
+    margin-top: 20px;
+}
+
 
 /* Customize color button styling */
 .main .add-cust-color-button {
@@ -476,20 +510,46 @@
     width: fit-content;
     font-weight: 500;
     color: #0fa662;
+    margin: 10px;
 }
 
-/* Delete button hover effect */
-.add-template-button.delete:hover {
-    background: #a81a0f;
-}
 
-/* Shared list style */
-.shared-list {
+    /* Shared list style */
+    .shared-list {
     color: black;
     font-size: 12px;
     margin-top: 5px;
     padding-left: 5px;
-}
+    }
+
+    /* Flashcard styling */
+    .flashcard {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Card shadow effect */
+    transition: box-shadow 0.3s ease;
+    width: 100%;
+    }
+
+    .flashcard:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Larger shadow on hover */
+    }
+
+
+    /* Flashcard labels */
+    .flashcard label {  
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    }
+
+    /* Flashcard flex container for inputs and buttons */
+    .flashcard .flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
 
     </style>
     <meta charset="UTF-8">
@@ -590,6 +650,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
+    <div class="button-container">
     <form action="/templates/new-from-todo" method="post">
         {% csrf_token %}
         <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
@@ -600,82 +661,82 @@
         <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
         <button class="add-template-button delete" onclick="">Delete</button>
     </form>
+    </div>
 
     {% endfor %}
 
 
-        {% for list in latest_lists %}
-            <div class="header">
-                <h2>
-                    <a href="/todo/{{ list.id }}">{{ list.title_text }} {% if list.list_tag != "none" %}
+    {% for list in latest_lists %}
+    <div class="flashcard">
+        <div class="header">
+            <h2>
+                <a href="/todo/{{ list.id }}">{{ list.title_text }} 
+                    {% if list.list_tag != "none" %}
                         <button type="button" class="tag-template">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag-fill" viewBox="0 0 16 16">
                                 <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                              </svg>
+                            </svg>
                             {{ list.list_tag }}
                         </button>
-                        {% endif %}
-                        {% if list.is_shared == True %}
-                            <img src="https://cdn0.iconfinder.com/data/icons/multimedia-261/32/Send-512.png" title="This To-Do list is shared by you." height="16px" width="16px">
-                        {% endif %}
-                    </a>
-                </h2>
-                <!-- <input type="text" id="{{ "InputText_"|addstr:list.id }}" placeholder="New Task">
-                <span onclick="newElement({{ list.id }})" class="addBtn">Add</span> -->
-                <form>
-                    <div class="form-group">
-                      <label for="{{ "InputText_"|addstr:list.id }}">New Task</label>
-                      <input type="text" class="form-control" id="{{ "InputText_"|addstr:list.id }}">
-                    </div>
-                    <div class="form-group">
-                      <label for="{{ "InputDue_"|addstr:list.id }}">Due Date</label>
-                      <input type="date" class="form-control" id="{{ "InputDue_"|addstr:list.id }}">
-                    </div>
-		            <div class="form-group">
-                        <label for="{{ "InputColor_"|addstr:list.id }}">Color Tag</label>
-                        <input type="color" class="form-control" id="{{ "InputColor_"|addstr:list.id }}" value="#f9f9f9">
-                    </div>
-                </form>
-                <div>
-                    <span onclick="newElement({{ list.id }})" class="addBtn">Add</span>
-                </div>
-            </div>
-            <ul id="{{ "List_"|addstr:list.id }}" class="listItemsUnorderedList">
-                {% for list_item in latest_list_items %}
-                    {% if list_item.list_id == list.id %}
-                        {% if not list_item.is_done %}
-                            <li style="background-color:{{list_item.tag_color}};" class="listItem">
-                        {% else %}
-                             <li style="background-color:{{list_item.tag_color}};" class="listItem done">
-                        {% endif %}
-                        {% if not list_item.is_done %}
-                                <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}">
-                        {% else %}
-                                <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}" checked>
-                        {% endif %}
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}">{{ list_item.item_name }}</label>
-                                <br>
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}" class="text-right">Start date: {{ list_item.created_on }}</label>
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}" style="color:{{list_item.color}};">Due: {{list_item.due_date}}</label>
-                                {% if list_item.is_done == 1%}
-                                    <p> It took you: {{ list_item.finished_on|timeuntil:list_item.created_on }} to complete</p>
-                                {% endif %}
-                                <span class="close">x</span>
-                            </li>
                     {% endif %}
-                {% endfor %}
-            </ul>
-        <form action="/templates/new-from-todo" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
-            <button class="add-template-button" onclick="">Save As Template</button>
+                    {% if list.is_shared == True %}
+                        <img src="https://cdn0.iconfinder.com/data/icons/multimedia-261/32/Send-512.png" title="This To-Do list is shared by you." height="16px" width="16px">
+                    {% endif %}
+                </a>
+            </h2>
+        </div>
+        
+        <form>
+            <div class="form-group">
+                <label for="{{ "InputText_"|addstr:list.id }}">New Task</label>
+                <input type="text" class="form-control" id="{{ "InputText_"|addstr:list.id }}">
+            </div>
+            <div class="form-group">
+                <label for="{{ "InputDue_"|addstr:list.id }}">Due Date</label>
+                <input type="date" class="form-control" id="{{ "InputDue_"|addstr:list.id }}">
+            </div>
+            <div class="form-group">
+                <label for="{{ "InputColor_"|addstr:list.id }}">Color Tag</label>
+                <input type="color" class="form-control" id="{{ "InputColor_"|addstr:list.id }}" value="#f9f9f9">
+            </div>
+            <div>
+                <button type="button" onclick="newElement({{ list.id }})" class="addBtn">Add</button> <!-- Add Button -->
+            </div>
         </form>
-        <form action="/delete-todo" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
-            <button class="add-template-button delete" onclick="">Delete</button>
-        </form>
-        {% endfor %}  
+        
+        <ul id="{{ "List_"|addstr:list.id }}" class="listItemsUnorderedList">
+            {% for list_item in latest_list_items %}
+                {% if list_item.list_id == list.id %}
+                    <li style="background-color:{{list_item.tag_color}};" class="listItem {% if list_item.is_done %}done{% endif %}">
+                        <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}" {% if list_item.is_done %}checked{% endif %}>
+                        <label for="{{ "ListItem_"|addstr:list_item.id }}">{{ list_item.item_name }}</label>
+                        <span class="close">x</span>
+                        <br>
+                        <label class="text-right">Start date: {{ list_item.created_on }}</label>
+                        <label style="color:{{list_item.color}};">Due: {{list_item.due_date}}</label>
+                        {% if list_item.is_done == 1 %}
+                            <p> It took you: {{ list_item.finished_on|timeuntil:list_item.created_on }} to complete</p>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <!-- Button Container for Save/Delete buttons -->
+        <div class="button-container">
+            <form action="/templates/new-from-todo" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
+                <button class="add-template-button">Save As Template</button>
+            </form>
+            <form action="/delete-todo" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
+                <button class="add-template-button delete">Delete</button>
+            </form>
+        </div>
+    </div>
+        {% endfor %}
         {% if not latest_lists %}
             {% if not shared_list %}
         <div class="header">
@@ -726,70 +787,70 @@ function removeListItem() {
 
 // When click a list item, restore all othe
 var list = document.getElementsByClassName("listItemsUnorderedList");
-for(let i = 0; i < list.length; i++) {
+// Initially hide the right sidebar
+rightsidebar.style.display = "none";
+
+for (let i = 0; i < list.length; i++) {
     list[i].addEventListener('click', function (ev) {
         if (ev.target.tagName === 'LI') {
-            {#ev.target.classList.toggle('checked');#}
-            // restore all other checked list items
-            for(let k = 0; k < list.length; k++) {
+            // Remove 'checked' class from all list items
+            for (let k = 0; k < list.length; k++) {
                 for (let j = 0; j < list[k].children.length; j++) {
                     if (list[k].children[j].classList.contains('checked') && list[k].children[j] !== ev.target) {
-                        list[k].children[j].classList.remove('checked')
+                        list[k].children[j].classList.remove('checked');
                     }
                 }
             }
-            // show list item name and its note in the right-side bar
 
-            // TODO access database and get list and list item info
-            var item_name = ev.target.children[1].innerHTML
-            // ListItem_{id}, capture id start from index 9
-            var item_id = ev.target.getElementsByTagName("input")[0].id.toString().substring(9)
+            // Show the right sidebar when a list item is clicked
+            rightsidebar.style.display = "block";
 
-            // this list id will look like List_{id}, so remove the first five letters
-            var list_id = ev.target.parentElement.id.substring(5)
-            var httpRequest = new XMLHttpRequest()
-            {#httpRequest.onreadystatechange = alertContents;#}
+            // Retrieve the necessary data to update the right sidebar
+            var item_name = ev.target.children[1].innerHTML;
+            var item_id = ev.target.getElementsByTagName("input")[0].id.toString().substring(9);
+            var list_id = ev.target.parentElement.id.substring(5);
+
+            var httpRequest = new XMLHttpRequest();
             httpRequest.onreadystatechange = function() {
-              if (this.readyState === 4 && this.status === 200) {
-                  console.log(this.responseText)
-                  var jsonResponse = JSON.parse(this.responseText)
-                  var rightsidebar = document.getElementById("rightsidebar")
+                if (this.readyState === 4 && this.status === 200) {
+                    console.log(this.responseText);
+                    var jsonResponse = JSON.parse(this.responseText);
 
-                  var list_title_li_node = rightsidebar.children[0]
-                  var list_text_node = list_title_li_node.children[0]
-                  list_text_node.innerHTML = "List name: " + jsonResponse['list_name']
+                    // Update the right sidebar with the received data
+                    var list_title_li_node = rightsidebar.children[0];
+                    var list_text_node = list_title_li_node.children[0];
+                    list_text_node.innerHTML = "List name: " + jsonResponse['list_name'];
 
-                  var item_title_li_node = rightsidebar.children[1]
-                  var item_text_node = item_title_li_node.children[0]
-                  item_text_node.innerHTML = "Item name: " + jsonResponse['item_name']
+                    var item_title_li_node = rightsidebar.children[1];
+                    var item_text_node = item_title_li_node.children[0];
+                    item_text_node.innerHTML = "Item name: " + jsonResponse['item_name'];
 
-                  var item_form_node = rightsidebar.children[3]
-                  var item_textarea_node = item_form_node.children[1]
-                  item_textarea_node.value = jsonResponse['item_text']
+                    var item_form_node = rightsidebar.children[3];
+                    var item_textarea_node = item_form_node.children[1];
+                    item_textarea_node.value = jsonResponse['item_text'];
 
-                  // set the action url, append item id parameter to the end of url
-                  var text_form = rightsidebar.getElementsByTagName("form")[0]
-                  text_form.action = "/updateListItem/" + jsonResponse['item_id']
-                {#document.getElementById('demoGet').innerHTML = this.responseText;#}
-              }
+                    // Set the action URL, append item id parameter to the end of the URL
+                    var text_form = rightsidebar.getElementsByTagName("form")[0];
+                    text_form.action = "/updateListItem/" + jsonResponse['item_id'];
+                }
             };
+
             httpRequest.open('POST', '/getListItemById');
-            httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8")
-            {#var token = {% csrf_token %}#}
+            httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
+
             var params = {
                 "list_item_name": item_name,
                 "list_id": list_id,
-                "list_item_id": item_id,
-            }
-            httpRequest.send(JSON.stringify(params))
+                "list_item_id": item_id
+            };
+            httpRequest.send(JSON.stringify(params));
 
-
-            // Change the content of right-side bar
+            // Change the content of the right sidebar and mark the clicked item as checked
             ev.target.classList.toggle('checked');
-            {#global_count++#}
         }
     }, false);
 }
+
 
 var listItemsCheckBoxes = document.querySelectorAll("input[type=checkbox]");
 {#let enabledSettings = []#}
@@ -802,28 +863,48 @@ https://vanillajstoolkit.com/polyfills/arrayforeach/
 // mark item as done or undo it
 function markListItemByName() {
     if (this.parentElement.tagName === 'LI') {
+        // Toggle the "done" class for the list item
         this.parentElement.classList.toggle('done');
-        // TODO need to remove the list item from database
-        var item_name = this.nextElementSibling.innerHTML
-        // List_{id}
-        var list_id = this.parentElement.parentElement.id.toString().substring(5)
-        // ListItem_{id}
-        var list_item_id = this.id.toString().substring(9)
-        var httpRequest = new XMLHttpRequest()
-        var is_done = this.parentElement.classList.contains('done')
-        var today = new Date()
-        var finish_on_timestamp = today.getTime() / 1000
-        httpRequest.open('POST', '/markListItem');
-        httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8")
+        
+        // Extract necessary information
+        var item_name = this.nextElementSibling.innerHTML;
+        var list_id = this.parentElement.parentElement.id.toString().substring(5); // Extract list ID
+        var list_item_id = this.id.toString().substring(9); // Extract list item ID
+        var is_done = this.parentElement.classList.contains('done'); // Check if the item is marked as done
+        var today = new Date();
+        var finish_on_timestamp = today.getTime() / 1000; // Get the current timestamp
+        
+        // Create a new XMLHttpRequest object
+        var httpRequest = new XMLHttpRequest();
+        
+        // Set up the POST request to update the item
+        httpRequest.open('POST', '/markListItem', true);
+        httpRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        
+        // Prepare the parameters to be sent in the request body
         var params = {
             "list_id": list_id,
             "list_item_name": item_name,
             "is_done": is_done,
             "list_item_id": list_item_id,
             "finish_on": finish_on_timestamp
-        }
-        httpRequest.send(JSON.stringify(params))
-        window.location.reload();
+        };
+        
+        // Send the request with the parameters as JSON
+        httpRequest.send(JSON.stringify(params));
+        
+        // Handle the response
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState === 4) {
+                if (httpRequest.status === 200) {
+                    // Success: Optionally show a success message or handle UI updates
+                    console.log('Item marked as done/undone successfully');
+                } else {
+                    // Error: Handle error case
+                    console.error('Failed to mark the item. Please try again.');
+                }
+            }
+        };
     }
 }
 
