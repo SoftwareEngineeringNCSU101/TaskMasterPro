@@ -514,22 +514,12 @@ def password_reset_request(request):
 # views.py
 from django.shortcuts import render
 from .models import ListItem
+from django.shortcuts import render
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.utils import timezone
+from .models import ListItem  # Ensure this line correctly imports your ListItem model
 
-# def user_analytics(request):
-#     # Retrieve all list items from the database
-#     all_list_items = ListItem.objects.all()
-
-#     # Render the items to a template
-#     return render(request, 'todo/user_analytics.html', {'list_items': all_list_items})
-
-# from datetime import date
-
-# def user_analytics(request):
-#     # Your existing logic to get list_items or other data
-#     list_items = ListItem.objects.all()  # Assuming you fetch it here
-#     today = date.today()
-    
-#     return render(request, 'todo/user_analytics.html', {'list_items': list_items, 'today': today})
 
 def user_analytics(request):
     today = timezone.now().date()
@@ -539,8 +529,34 @@ def user_analytics(request):
     overdue_tasks = ListItem.objects.filter(due_date__lt=today, is_done=False).count()
     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
+    # Aggregations for daily, weekly, and monthly completions
+    daily_completions = ListItem.objects.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
+    weekly_completions = ListItem.objects.filter(is_done=True).annotate(week=TruncWeek('finished_on')).values('week').annotate(count=Count('id')).order_by('week')
+    monthly_completions = ListItem.objects.filter(is_done=True).annotate(month=TruncMonth('finished_on')).values('month').annotate(count=Count('id')).order_by('month')
+
+    # Convert data for Chart.js
+    daily_data = {
+        'labels': [item['date'].strftime('%Y-%m-%d') for item in daily_completions],
+        'counts': [item['count'] for item in daily_completions]
+    }
+    weekly_data = {
+        'labels': [item['week'].strftime('%Y-%W') for item in weekly_completions],
+        'counts': [item['count'] for item in weekly_completions]
+    }
+    monthly_data = {
+        'labels': [item['month'].strftime('%Y-%m') for item in monthly_completions],
+        'counts': [item['count'] for item in monthly_completions]
+    }
+
     context = {
         'list_items': ListItem.objects.all(),
+
+
+        'daily_data': daily_data,
+        'weekly_data': weekly_data,
+        'monthly_data': monthly_data,
+
+
         'due_soon_count': ListItem.objects.filter(due_date__gte=today, is_done=False).count(),
         'overdue_count': overdue_tasks,
         'completed_count': ListItem.objects.filter(is_done=True).count(),

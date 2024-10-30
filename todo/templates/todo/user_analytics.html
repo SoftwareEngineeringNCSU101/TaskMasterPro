@@ -1,40 +1,11 @@
 <!-- user_analytics.html -->
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Analytics</title>
-</head>
-<body>
-    <h1>User Analytics</h1>
-    <h2>All List Items</h2>
-    <ul>
-        {% for item in list_items %}
-            <li style="background-color: {{ item.tag_color }};">
-                <strong>{{ item.item_name }}</strong><br>
-                Created On: {{ item.created_on }}<br>
-                Due Date: {{ item.due_date }}<br>
-                {% if item.is_done %}
-                    <span style="color: green;">Completed</span>
-                {% else %}
-                    <span style="color: red;">Pending</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No items found.</li>
-        {% endfor %} 
-     </ul>
-</body>
-</html> -->
-
-<!-- user_analytics.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,10 +56,106 @@
             color: #555;
             font-size: 0.9em;
         }
+        .chart-section {
+            display: flex;
+            justify-content: space-around; /* Space the charts evenly */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .chart-container {
+            flex: 1;
+            min-width: 300px; /* Ensure a minimum width */
+            max-width: 400px; /* Control the maximum width */
+            margin: 20px; /* Add some margin around the containers */
+        }
     </style>
 </head>
 <body>
     <h1>User Analytics</h1>
+
+    <div class="chart-section">
+        <div class="chart-container">
+            <h2>Daily Task Completion</h2>
+            <canvas id="dailyChart" width="300" height="150"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h2>Weekly Task Completion</h2>
+            <canvas id="weeklyChart" width="300" height="150"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Monthly Task Completion</h2>
+            <canvas id="monthlyChart" width="300" height="150"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Daily Completion Chart
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: {{ daily_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ daily_data.counts|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Date' } },
+                    y: { title: { display: true, text: 'Tasks Completed' } }
+                }
+            }
+        });
+
+        // Weekly Completion Chart
+        const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+        new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ weekly_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ weekly_data.counts|safe }},
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Week' } },
+                    y: { title: { display: true, text: 'Tasks Completed' } }
+                }
+            }
+        });
+
+        // Monthly Completion Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ monthly_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ monthly_data.counts|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Month' } },
+                    y: { title: { display: true, text: 'Tasks Completed' } }
+                }
+            }
+        });
+    </script>
+
     <div>
         <p><strong>Due Soon Count:</strong> {{ due_soon_count }}</p>
         <p><strong>Overdue Count:</strong> {{ overdue_count }}</p>
@@ -96,8 +163,8 @@
         <p><strong>Overdue Percentage:</strong> {{ overdue_percentage }}%</p>
         <p><strong>Average Completion Time:</strong> {% if avg_completion_time %}{{ avg_completion_time.days }} days {% else %} N/A {% endif %}</p>
     </div>
+    
     <div class="container">
-        
         <div class="section">
             <h2>Due Soon</h2>
             <ul>
