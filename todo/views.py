@@ -522,11 +522,29 @@ from .models import ListItem
 #     # Render the items to a template
 #     return render(request, 'todo/user_analytics.html', {'list_items': all_list_items})
 
-from datetime import date
+# from datetime import date
+
+# def user_analytics(request):
+#     # Your existing logic to get list_items or other data
+#     list_items = ListItem.objects.all()  # Assuming you fetch it here
+#     today = date.today()
+    
+#     return render(request, 'todo/user_analytics.html', {'list_items': list_items, 'today': today})
 
 def user_analytics(request):
-    # Your existing logic to get list_items or other data
-    list_items = ListItem.objects.all()  # Assuming you fetch it here
-    today = date.today()
+    today = timezone.now().date()
     
-    return render(request, 'todo/user_analytics.html', {'list_items': list_items, 'today': today})
+    # Total tasks
+    total_tasks = ListItem.objects.count()
+    overdue_tasks = ListItem.objects.filter(due_date__lt=today, is_done=False).count()
+    overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    context = {
+        'list_items': ListItem.objects.all(),
+        'due_soon_count': ListItem.objects.filter(due_date__gte=today, is_done=False).count(),
+        'overdue_count': overdue_tasks,
+        'completed_count': ListItem.objects.filter(is_done=True).count(),
+        'overdue_percentage': overdue_percentage,
+        'today': today
+    }
+    return render(request, 'todo/user_analytics.html', context)

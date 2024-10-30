@@ -89,7 +89,15 @@
 </head>
 <body>
     <h1>User Analytics</h1>
+    <div>
+        <p><strong>Due Soon Count:</strong> {{ due_soon_count }}</p>
+        <p><strong>Overdue Count:</strong> {{ overdue_count }}</p>
+        <p><strong>Completed Count:</strong> {{ completed_count }}</p>
+        <p><strong>Overdue Percentage:</strong> {{ overdue_percentage }}%</p>
+        <p><strong>Average Completion Time:</strong> {% if avg_completion_time %}{{ avg_completion_time.days }} days {% else %} N/A {% endif %}</p>
+    </div>
     <div class="container">
+        
         <div class="section">
             <h2>Due Soon</h2>
             <ul>
