@@ -201,6 +201,7 @@ def updateListItem(request, item_id):
 # Add a new to-do list item, called by javascript function
 @csrf_exempt
 def addNewListItem(request):
+    print('DEBUG')
     if not request.user.is_authenticated:
         return redirect("/login")
     if request.method == 'POST':
@@ -508,3 +509,24 @@ def password_reset_request(request):
     
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="todo/password/password_reset.html", context={"password_reset_form":password_reset_form})
+
+
+# views.py
+from django.shortcuts import render
+from .models import ListItem
+
+# def user_analytics(request):
+#     # Retrieve all list items from the database
+#     all_list_items = ListItem.objects.all()
+
+#     # Render the items to a template
+#     return render(request, 'todo/user_analytics.html', {'list_items': all_list_items})
+
+from datetime import date
+
+def user_analytics(request):
+    # Your existing logic to get list_items or other data
+    list_items = ListItem.objects.all()  # Assuming you fetch it here
+    today = date.today()
+    
+    return render(request, 'todo/user_analytics.html', {'list_items': list_items, 'today': today})

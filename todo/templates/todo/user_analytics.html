@@ -1,0 +1,142 @@
+<!-- user_analytics.html -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Analytics</title>
+</head>
+<body>
+    <h1>User Analytics</h1>
+    <h2>All List Items</h2>
+    <ul>
+        {% for item in list_items %}
+            <li style="background-color: {{ item.tag_color }};">
+                <strong>{{ item.item_name }}</strong><br>
+                Created On: {{ item.created_on }}<br>
+                Due Date: {{ item.due_date }}<br>
+                {% if item.is_done %}
+                    <span style="color: green;">Completed</span>
+                {% else %}
+                    <span style="color: red;">Pending</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No items found.</li>
+        {% endfor %} 
+     </ul>
+</body>
+</html> -->
+
+<!-- user_analytics.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Analytics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+        .section {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .list-item {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #e8e8e8;
+            border-left: 6px solid;
+        }
+        .due-soon {
+            border-color: #f39c12;
+        }
+        .overdue {
+            border-color: #e74c3c;
+        }
+        .completed {
+            border-color: #2ecc71;
+        }
+        .item-details {
+            color: #555;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Analytics</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Due Soon</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.due_date and item.due_date >= today and not item.is_done %}
+                        <li class="list-item due-soon">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Due Date: {{ item.due_date }}</span><br>
+                            <span class="item-details">Status: Pending</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Overdue</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.due_date and item.due_date < today and not item.is_done %}
+                        <li class="list-item overdue">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Due Date: {{ item.due_date }}</span><br>
+                            <span class="item-details">Status: Overdue</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Completed</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.is_done %}
+                        <li class="list-item completed">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Completed On: {{ item.finished_on }}</span><br>
+                            <span class="item-details">Status: Completed</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
