@@ -135,7 +135,7 @@
         <p><strong>Average Procrastination Time:</strong> {{ avg_procrastination_hours|floatformat:2 }} hours</p>
         <p><strong>Completed Count:</strong><br>{{ completed_count }}</p>
         <p><strong>Overdue Percentage:</strong> {{ overdue_percentage|floatformat:2 }}%</p>
-        <p><strong>Average Completion Time:</strong><br>{% if avg_completion_time %}{{ avg_completion_time.days }} days{% else %}N/A{% endif %}</p>
+        <p><strong>Average Completion Time of Tasks:</strong><br>{% if avg_completion_time_hours %}{{ avg_completion_time_hours|floatformat:2 }} hours{% else %}N/A{% endif %}</p>
     </div>
 
     <div class="chart-section">

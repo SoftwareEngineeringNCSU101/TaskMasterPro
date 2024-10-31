@@ -575,6 +575,32 @@ from django.utils import timezone
 from collections import defaultdict
 
 
+from collections import defaultdict
+from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+import datetime
+
+import datetime
+from collections import defaultdict
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.utils import timezone
+
+from collections import defaultdict
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.shortcuts import render
+from django.utils import timezone
+import datetime
+
+from collections import defaultdict
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.shortcuts import render
+from django.utils import timezone
+import datetime
+
 def user_analytics(request):
     user = request.user
     today = timezone.now().date()
@@ -583,7 +609,7 @@ def user_analytics(request):
     user_lists = List.objects.filter(user_id=user)
     user_list_items = ListItem.objects.filter(list__in=user_lists)
 
-    # Total tasks
+    # Total tasks and overdue calculations
     total_tasks = user_list_items.count()
     overdue_tasks = user_list_items.filter(due_date__lt=today, is_done=False).count()
     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
@@ -607,33 +633,42 @@ def user_analytics(request):
         'counts': [item['count'] for item in monthly_completions]
     }
 
+    # Procrastination and completion time metrics
     total_procrastination_hours = 0
     procrastination_count = 0
-    
-    for item in user_list_items:
-        if item.is_done and item.due_date and item.finished_on:
-            # Convert due_date to an aware datetime object
+    total_completion_time = 0
+    completion_count = 0
+
+    # Iterate only over tasks with both created_on and finished_on dates for completion time
+    for item in user_list_items.filter(is_done=True, finished_on__isnull=False, created_on__isnull=False):
+        # Procrastination calculation
+        if item.due_date:
             due_date = timezone.make_aware(
                 datetime.datetime.combine(item.due_date, datetime.datetime.min.time())
             ) if isinstance(item.due_date, datetime.date) else item.due_date
-
-            # Calculate procrastination in hours
             procrastination_duration = (item.finished_on - due_date).total_seconds() / 3600
-            if procrastination_duration > 0:  # Count only if the task was completed late
+            if procrastination_duration > 0:
                 total_procrastination_hours += procrastination_duration
                 procrastination_count += 1
 
+        # Completion time calculation
+        print(f"Task {item.id}: created_on = {item.created_on}, finished_on = {item.finished_on}")
+        completion_time = (item.finished_on - item.created_on).total_seconds() / 3600
+        total_completion_time += completion_time
+        completion_count += 1
+
+    # Calculate averages, ensuring non-zero denominators
     avg_procrastination_hours = total_procrastination_hours / procrastination_count if procrastination_count > 0 else 0
+    avg_completion_time_hours = total_completion_time / completion_count if completion_count > 0 else 0
 
+    # Task density for busy days
     tasks_per_day = defaultdict(int)
-
     for item in user_list_items:
         if item.due_date:
             tasks_per_day[item.due_date] += 1
 
-    # Create a dictionary to hold the category for each day
+    # Classify busy days
     busy_days = {}
-
     for due_date, count in tasks_per_day.items():
         if count >= 5:
             busy_days[due_date] = 'Very Busy'
@@ -643,7 +678,7 @@ def user_analytics(request):
             busy_days[due_date] = 'Moderately Busy'
         else:
             busy_days[due_date] = 'Not Busy'
-    print(busy_days)
+
     context = {
         'list_items': user_list_items,
         'daily_data': daily_data,
@@ -654,6 +689,7 @@ def user_analytics(request):
         'completed_count': user_list_items.filter(is_done=True).count(),
         'overdue_percentage': overdue_percentage,
         'avg_procrastination_hours': avg_procrastination_hours,
+        'avg_completion_time_hours': avg_completion_time_hours,
         'busy_days': busy_days,
         'today': today
     }
