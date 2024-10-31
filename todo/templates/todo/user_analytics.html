@@ -122,12 +122,34 @@
             background-color: green; /* Change this to your desired color */
         }
         
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        .button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
 
 
     </style>
 </head>
 <body>
     <h1>User Analytics</h1>
+
+    <div class="button-container" style="text-align: center; margin: 20px;">
+        <a href="/todo" class="btn btn-primary">Go to Index</a>
+    </div>    
+    
 
     <div class="summary">
         <p><strong>Due Soon Count:</strong><br>{{ due_soon_count }}</p>
