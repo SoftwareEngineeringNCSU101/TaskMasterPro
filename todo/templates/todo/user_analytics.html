@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -303,6 +303,327 @@
         </div>
 
         
+    </div>
+</body>
+</html> {% endcomment %}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Base styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9fc;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            color: #34495e;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 20px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000; /* Ensures the button is above other content */
+        }
+        
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 100px;
+            padding: 10px;
+            background-color: #eaeef3;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .summary p {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            width: 160px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Chart section styles */
+        .chart-section {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .chart-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            text-align: center;
+        }
+
+        /* Task lists */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 380px;
+            max-width: 420px;
+        }
+        
+        .section h2 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .list-item {
+            position: relative;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #fdfdfd;
+            border-left: 6px solid;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .list-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .due-soon { border-color: #f1c40f; }
+        .overdue { border-color: #e74c3c; }
+        .completed { border-color: #2ecc71; }
+        
+        .item-details {
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        /* Busy days */
+        .busy-days {
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1100px;
+            margin: auto;
+        }
+        
+        .accent-bar {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .accent-very-busy { background-color: #e74c3c; }
+        .accent-busy { background-color: #f39c12; }
+        .accent-moderately-busy { background-color: #f1c40f; }
+        .accent-not-busy { background-color: #2ecc71; }
+
+    </style>
+</head>
+<body>
+    <h1>User Analytics</h1>
+
+    <div class="button-container">
+        <a href="/todo" class="button">Back</a>
+    </div>    
+    
+    <div class="summary">
+        <p><strong>Due Soon Count:</strong><br>{{ due_soon_count }}</p>
+        <p><strong>Overdue Count:</strong><br>{{ overdue_count }}</p>
+        <p><strong>Average Procrastination Time:</strong> {{ avg_procrastination_hours|floatformat:2 }} hours</p>
+        <p><strong>Completed Count:</strong><br>{{ completed_count }}</p>
+        <p><strong>Overdue Percentage:</strong> {{ overdue_percentage|floatformat:2 }}%</p>
+        <p><strong>Average Completion Time of Tasks:</strong><br>{% if avg_completion_time_hours %}{{ avg_completion_time_hours|floatformat:2 }} hours{% else %}N/A{% endif %}</p>
+    </div>
+
+    <div class="chart-section">
+        <div class="chart-container">
+            <h2>Daily Task Completion</h2>
+            <canvas id="dailyChart" width="300" height="150"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Weekly Task Completion</h2>
+            <canvas id="weeklyChart" width="300" height="150"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Monthly Task Completion</h2>
+            <canvas id="monthlyChart" width="300" height="150"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Chart configurations
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: {{ daily_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ daily_data.counts|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+        new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ weekly_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ weekly_data.counts|safe }},
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)'
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ monthly_data.labels|safe }},
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: {{ monthly_data.counts|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+
+    <div class="busy-days">
+        <h2>Plan Ahead Your Busy Days</h2>
+        <ul>
+            {% for date, status in busy_days.items %}
+                <li class="list-item 
+                    {% if status == 'Very Busy' %}very_busy
+                    {% elif status == 'Busy' %}busy
+                    {% elif status == 'Moderately Busy' %}moderately_busy
+                    {% elif status == 'Not Busy' %}not_busy
+                    {% endif %}">
+                    <span class="accent-bar 
+                        {% if status == 'Very Busy' %}accent-very-busy
+                        {% elif status == 'Busy' %}accent-busy
+                        {% elif status == 'Moderately Busy' %}accent-moderately-busy
+                        {% elif status == 'Not Busy' %}accent-not-busy
+                        {% endif %}"></span>
+                    <strong>{{ date }}</strong><br>
+                    <span class="item-details">Status: {{ status }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Due Soon</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.due_date and item.due_date >= today and not item.is_done %}
+                        <li class="list-item due-soon">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Due Date: {{ item.due_date }}</span><br>
+                            <span class="item-details">Status: Pending</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Overdue</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.due_date and item.due_date < today and not item.is_done %}
+                        <li class="list-item overdue">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Due Date: {{ item.due_date }}</span><br>
+                            <span class="item-details">Status: Overdue</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Completed</h2>
+            <ul>
+                {% for item in list_items %}
+                    {% if item.is_done %}
+                        <li class="list-item completed">
+                            <strong>{{ item.item_name }}</strong><br>
+                            <span class="item-details">Created On: {{ item.created_on }}</span><br>
+                            <span class="item-details">Completed On: {{ item.finished_on }}</span><br>
+                            <span class="item-details">Status: Completed</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </body>
 </html>
