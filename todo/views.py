@@ -201,6 +201,7 @@ def updateListItem(request, item_id):
 # Add a new to-do list item, called by javascript function
 @csrf_exempt
 def addNewListItem(request):
+    print('DEBUG')
     if not request.user.is_authenticated:
         return redirect("/login")
     if request.method == 'POST':
@@ -508,3 +509,153 @@ def password_reset_request(request):
     
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="todo/password/password_reset.html", context={"password_reset_form":password_reset_form})
+
+
+# views.py
+from django.shortcuts import render
+from .models import ListItem
+from django.shortcuts import render
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.utils import timezone
+from .models import ListItem  # Ensure this line correctly imports your ListItem model
+
+
+# def user_analytics(request):
+#     today = timezone.now().date()
+    
+#     # Total tasks
+#     total_tasks = ListItem.objects.count()
+#     overdue_tasks = ListItem.objects.filter(due_date__lt=today, is_done=False).count()
+#     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+#     # Aggregations for daily, weekly, and monthly completions
+#     daily_completions = ListItem.objects.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
+#     weekly_completions = ListItem.objects.filter(is_done=True).annotate(week=TruncWeek('finished_on')).values('week').annotate(count=Count('id')).order_by('week')
+#     monthly_completions = ListItem.objects.filter(is_done=True).annotate(month=TruncMonth('finished_on')).values('month').annotate(count=Count('id')).order_by('month')
+
+#     # Convert data for Chart.js
+#     daily_data = {
+#         'labels': [item['date'].strftime('%Y-%m-%d') for item in daily_completions],
+#         'counts': [item['count'] for item in daily_completions]
+#     }
+#     weekly_data = {
+#         'labels': [item['week'].strftime('%Y-%W') for item in weekly_completions],
+#         'counts': [item['count'] for item in weekly_completions]
+#     }
+#     monthly_data = {
+#         'labels': [item['month'].strftime('%Y-%m') for item in monthly_completions],
+#         'counts': [item['count'] for item in monthly_completions]
+#     }
+
+#     context = {
+#         'list_items': ListItem.objects.all(),
+
+
+#         'daily_data': daily_data,
+#         'weekly_data': weekly_data,
+#         'monthly_data': monthly_data,
+
+
+#         'due_soon_count': ListItem.objects.filter(due_date__gte=today, is_done=False).count(),
+#         'overdue_count': overdue_tasks,
+#         'completed_count': ListItem.objects.filter(is_done=True).count(),
+#         'overdue_percentage': overdue_percentage,
+#         'today': today
+#     }
+#     return render(request, 'todo/user_analytics.html', context)
+
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.utils import timezone
+from django.shortcuts import render
+from .models import ListItem, List
+# from datetime import datetime, date, timedelta
+from django.utils import timezone
+from collections import defaultdict
+
+
+def user_analytics(request):
+    user = request.user
+    today = timezone.now().date()
+
+    # Filter ListItems by lists belonging to the logged-in user
+    user_lists = List.objects.filter(user_id=user)
+    user_list_items = ListItem.objects.filter(list__in=user_lists)
+
+    # Total tasks
+    total_tasks = user_list_items.count()
+    overdue_tasks = user_list_items.filter(due_date__lt=today, is_done=False).count()
+    overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    # Aggregations for daily, weekly, and monthly completions
+    daily_completions = user_list_items.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
+    weekly_completions = user_list_items.filter(is_done=True).annotate(week=TruncWeek('finished_on')).values('week').annotate(count=Count('id')).order_by('week')
+    monthly_completions = user_list_items.filter(is_done=True).annotate(month=TruncMonth('finished_on')).values('month').annotate(count=Count('id')).order_by('month')
+
+    # Convert data for Chart.js
+    daily_data = {
+        'labels': [item['date'].strftime('%Y-%m-%d') for item in daily_completions],
+        'counts': [item['count'] for item in daily_completions]
+    }
+    weekly_data = {
+        'labels': [item['week'].strftime('%Y-%W') for item in weekly_completions],
+        'counts': [item['count'] for item in weekly_completions]
+    }
+    monthly_data = {
+        'labels': [item['month'].strftime('%Y-%m') for item in monthly_completions],
+        'counts': [item['count'] for item in monthly_completions]
+    }
+
+    total_procrastination_hours = 0
+    procrastination_count = 0
+    
+    for item in user_list_items:
+        if item.is_done and item.due_date and item.finished_on:
+            # Convert due_date to an aware datetime object
+            due_date = timezone.make_aware(
+                datetime.datetime.combine(item.due_date, datetime.datetime.min.time())
+            ) if isinstance(item.due_date, datetime.date) else item.due_date
+
+            # Calculate procrastination in hours
+            procrastination_duration = (item.finished_on - due_date).total_seconds() / 3600
+            if procrastination_duration > 0:  # Count only if the task was completed late
+                total_procrastination_hours += procrastination_duration
+                procrastination_count += 1
+
+    avg_procrastination_hours = total_procrastination_hours / procrastination_count if procrastination_count > 0 else 0
+
+    tasks_per_day = defaultdict(int)
+
+    for item in user_list_items:
+        if item.due_date:
+            tasks_per_day[item.due_date] += 1
+
+    # Create a dictionary to hold the category for each day
+    busy_days = {}
+
+    for due_date, count in tasks_per_day.items():
+        if count >= 5:
+            busy_days[due_date] = 'Very Busy'
+        elif count >= 3:
+            busy_days[due_date] = 'Busy'
+        elif count >= 1:
+            busy_days[due_date] = 'Moderately Busy'
+        else:
+            busy_days[due_date] = 'Not Busy'
+    print(busy_days)
+    context = {
+        'list_items': user_list_items,
+        'daily_data': daily_data,
+        'weekly_data': weekly_data,
+        'monthly_data': monthly_data,
+        'due_soon_count': user_list_items.filter(due_date__gte=today, is_done=False).count(),
+        'overdue_count': overdue_tasks,
+        'completed_count': user_list_items.filter(is_done=True).count(),
+        'overdue_percentage': overdue_percentage,
+        'avg_procrastination_hours': avg_procrastination_hours,
+        'busy_days': busy_days,
+        'today': today
+    }
+
+    return render(request, 'todo/user_analytics.html', context)
