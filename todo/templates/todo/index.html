@@ -183,90 +183,7 @@
     margin: 30px 5%;
 }
 
-.rightsidebar {
-    display: none; /* Hidden by default */
-    height: 100%;
-    width: 450px;
-    position: fixed;
-    top: 0;
-    right: 0;
-    background-color: #eee;
-    overflow-x: hidden;
-    padding-top: 10px;
-    padding-right: 10px;
-    margin-top: 70px; /* Adjust to match the topbar height */
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-    z-index: 99; /* Ensure it's on top */
-    transition: width 0.3s ease;
-}
-
-/* Right sidebar becomes visible when activated */
-.rightsidebar.visible {
-    display: block; /* Shows the sidebar */
-}
-
-/* Rest of the sidebar styles (unchanged) */
-.rightsidebar hr {
-    height: 2px;
-    background-color: #0fa662;
-    border: none;
-    width: 87%;
-}
-
-/* Right Sidebar link styles */
-.rightsidebar a {
-    padding: 10px 16px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #333;
-    display: block;
-    transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* Sidebar hover effects */
-.rightsidebar a:hover {
-    background-color: #e2e2e2;
-    color: #0fa662;
-}
-
-/* Form and textarea styling */
-.rightsidebar form {
-    padding: 10px 16px;
-    font-size: 18px;
-    color: #333;
-}
-
-.rightsidebar textarea {
-    width: 90%;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-}
-
-/* Save button styling */
-.rightsidebar .save-button {
-    padding: 10px 15px;
-    background: #0fa662;
-    color: #fff;
-    font-size: 16px;
-    text-align: center;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 80%; /* Adjust width to make the button smaller */
-    margin: 30px auto; /* Centers the button horizontally */
-    display: block; /* Ensures it's treated as a block element for centering */
-}
-
-.rightsidebar .save-button:hover {
-    background-color: #0b8f54;
-}
-
-      /* Main content area styling */
+/* Main content area styling */
 .main {
     margin-left: 300px; /* Adjusted margin-left to match the width of the left sidebar */
     margin-right: 500px; /* Right margin for right sidebar */
@@ -551,6 +468,66 @@
         justify-content: space-between;
     }
 
+    .popup-container {
+    display: none; /* Hidden by default */
+    position: relative;
+    background-color: #f9f9f9; /* Light background for readability */
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 95%;
+    max-width: 500px; /* Limit max width for cleaner look */
+}
+
+.popup-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-container label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.popup-container textarea {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.popup-container .save-button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.popup-container .save-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.popup-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+}
+
+.popup-close-btn:hover {
+    color: #333; /* Darker color on hover */
+}
+
     </style>
     <meta charset="UTF-8">
     <title>To-Done</title>
@@ -747,20 +724,6 @@
         {% endif %}
     </div>
 
-    {% if latest_lists or shared_list %}
-        <ul class="rightsidebar" id = "rightsidebar">
-            <li><a>List name</a></li>
-            <li><a>Item name</a></li>
-            <li hidden><a></a></li>
-            <form action="/updateListItem/0" method="post">
-                <p><label for="note">Note:</label></p>
-                <textarea id="note" name="note" rows="4" cols="50">
-                </textarea>
-                <br>
-                <input class="save-button" type="submit" value="Save">
-            </form>
-        </ul>
-    {% endif %}
 </body>
 <script>
 // Click on a close button to hide the current list item
@@ -786,10 +749,7 @@ function removeListItem() {
     httpRequest.send(JSON.stringify(params))
 }
 
-// When click a list item, restore all othe
 var list = document.getElementsByClassName("listItemsUnorderedList");
-// Initially hide the right sidebar
-rightsidebar.style.display = "none";
 
 for (let i = 0; i < list.length; i++) {
     list[i].addEventListener('click', function (ev) {
@@ -803,63 +763,107 @@ for (let i = 0; i < list.length; i++) {
                 }
             }
 
-            // Show the right sidebar when a list item is clicked
-            rightsidebar.style.display = "block";
+            // Check if a popup is already open; if so, close it
+            const existingPopup = document.querySelector('.popup-container');
+            if (existingPopup) existingPopup.remove();
 
-            // Retrieve the necessary data to update the right sidebar
-            var item_name = ev.target.children[1].innerHTML;
-            var item_id = ev.target.getElementsByTagName("input")[0].id.toString().substring(9);
-            var list_id = ev.target.parentElement.id.substring(5);
+            // Create the popup container
+            const popupContainer = document.createElement('div');
+            popupContainer.className = 'popup-container';
 
+            // Close button for the popup
+            const closeButton = document.createElement('span');
+            closeButton.className = 'popup-close-btn';
+            closeButton.innerHTML = '&times;';
+            closeButton.onclick = function () {
+                popupContainer.remove(); // Close popup on button click
+            };
+            popupContainer.appendChild(closeButton);
+
+            // Extract necessary information for the form action URL
+            const itemName = ev.target.children[1].innerHTML;
+            const itemId = ev.target.getElementsByTagName("input")[0].id.substring(9);
+            const listId = ev.target.parentElement.id.substring(5);
+
+            // Populate popup content (only showing the note form)
+            const content = document.createElement('div');
+            content.innerHTML = `
+                <form id="noteForm_${itemId}" method="post">
+                    <label for="note">Note:</label>
+                    <textarea id="note" name="note" rows="4" cols="50"></textarea>
+                    <input class="save-button" type="button" value="Save">
+                </form>
+                <p id="save-message" style="display: none; color: green; font-size: 12px;">Note saved successfully!</p>
+            `;
+            popupContainer.appendChild(content);
+
+            // Insert the popup below the clicked list item
+            ev.target.insertAdjacentElement('afterend', popupContainer);
+
+            // Show the popup container
+            popupContainer.style.display = "block";
+
+            // Fetch existing note data using AJAX
             var httpRequest = new XMLHttpRequest();
             httpRequest.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
-                    console.log(this.responseText);
                     var jsonResponse = JSON.parse(this.responseText);
 
-                    // Update the right sidebar with the received data
-                    var list_title_li_node = rightsidebar.children[0];
-                    var list_text_node = list_title_li_node.children[0];
-                    list_text_node.innerHTML = "List name: " + jsonResponse['list_name'];
-
-                    var item_title_li_node = rightsidebar.children[1];
-                    var item_text_node = item_title_li_node.children[0];
-                    item_text_node.innerHTML = "Item name: " + jsonResponse['item_name'];
-
-                    var item_form_node = rightsidebar.children[3];
-                    var item_textarea_node = item_form_node.children[1];
-                    item_textarea_node.value = jsonResponse['item_text'];
-
-                    // Set the action URL, append item id parameter to the end of the URL
-                    var text_form = rightsidebar.getElementsByTagName("form")[0];
-                    text_form.action = "/updateListItem/" + jsonResponse['item_id'];
+                    // Update the note textarea with the fetched note text
+                    popupContainer.querySelector('#note').value = jsonResponse['item_text'];
                 }
             };
-
             httpRequest.open('POST', '/getListItemById');
             httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
-
             var params = {
-                "list_item_name": item_name,
-                "list_id": list_id,
-                "list_item_id": item_id
+                "list_item_name": itemName,
+                "list_id": listId,
+                "list_item_id": itemId
             };
             httpRequest.send(JSON.stringify(params));
 
-            // Change the content of the right sidebar and mark the clicked item as checked
+            // Handle note saving via AJAX
+            const form = popupContainer.querySelector(`#noteForm_${itemId}`);
+            const saveButton = form.querySelector('.save-button');
+            saveButton.addEventListener('click', function() {
+                const noteContent = form.querySelector('#note').value;
+
+                // Send the note data via AJAX
+                var saveRequest = new XMLHttpRequest();
+                saveRequest.onreadystatechange = function() {
+                    if (saveRequest.readyState === 4 && saveRequest.status === 200) {
+                        console.log('Note saved successfully');
+                        // Keep the updated note content visible
+                        form.querySelector('#note').value = noteContent;
+                        
+                        // Show a success message briefly
+                        const saveMessage = popupContainer.querySelector('#save-message');
+                        saveMessage.style.display = "block";
+                        setTimeout(() => {
+                            saveMessage.style.display = "none";
+                        }, 2000); // Hide message after 2 seconds
+                    }
+                };
+                saveRequest.open('POST', `/updateListItem/${itemId}`);
+                saveRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
+                var saveParams = {
+                    "list_item_id": itemId,
+                    "note": noteContent
+                };
+                saveRequest.send(JSON.stringify(saveParams));
+            });
+
+            // Mark the clicked item as checked
             ev.target.classList.toggle('checked');
         }
     }, false);
 }
-
-
+// Use Array.forEach to add an event listener to each checkbox
 var listItemsCheckBoxes = document.querySelectorAll("input[type=checkbox]");
-{#let enabledSettings = []#}
-/*
-For IE11 support, replace arrow functions with normal functions and
-use a polyfill for Array.forEach:
-https://vanillajstoolkit.com/polyfills/arrayforeach/
-*/
+    listItemsCheckBoxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', markListItemByName)
+    });
+
 
 // mark item as done or undo it
 function markListItemByName() {

@@ -180,23 +180,35 @@ def updateListItem(request, item_id):
     if not request.user.is_authenticated:
         return redirect("/login")
     if request.method == 'POST':
-        updated_text = request.POST['note']
-        # print(request.POST)
-        print(updated_text)
-        print(item_id)
-        if item_id <= 0:
-            return redirect("index")
         try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            updated_text = data.get('note')
+
+            if not updated_text:
+                return JsonResponse({"success": False, "message": "Note content is missing"}, status=400)
+
+            if item_id <= 0:
+                return JsonResponse({"success": False, "message": "Invalid item ID"}, status=400)
+
+            # Update the item in the database within a transaction
             with transaction.atomic():
                 todo_list_item = ListItem.objects.get(id=item_id)
                 todo_list_item.item_text = updated_text
                 todo_list_item.save(force_update=True)
+
+            # Return a JSON response indicating success
+            return JsonResponse({"success": True, "message": "Note updated successfully"})
+
+        except ListItem.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Item not found"}, status=404)
         except IntegrityError as e:
             print(str(e))
-            print("unknown error occurs when trying to update todo list item text")
-        return redirect("/")
+            return JsonResponse({"success": False, "message": "Database error occurred"}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Invalid JSON data"}, status=400)
     else:
-        return redirect("index")
+        return JsonResponse({"success": False, "message": "Invalid request method"}, status=405)
 
 
 # Add a new to-do list item, called by javascript function
