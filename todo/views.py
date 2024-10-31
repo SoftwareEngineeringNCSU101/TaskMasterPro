@@ -448,23 +448,97 @@ def register_request(request):
 
 
 # Login a user
+
+# List.objects.filter(user_id_id=request.user.id).order_by('-updated_on')
+
+# def login_request(request):
+# 	if request.method == "POST":
+# 		form = AuthenticationForm(request, data=request.POST)
+# 		if form.is_valid():
+# 			username = form.cleaned_data.get('username')
+# 			password = form.cleaned_data.get('password')
+# 			user = authenticate(username=username, password=password)
+# 			if user is not None:
+# 				login(request, user)
+# 				messages.info(request, f"You are now logged in as {username}.")
+# 				return redirect("todo:index")
+# 			else:
+# 				messages.error(request,"Invalid username or password.")
+# 		else:
+# 			messages.error(request,"Invalid username or password.")
+# 	form = AuthenticationForm()
+# 	return render(request=request, template_name="todo/login.html", context={"login_form":form})
+
+
+
+
+
+from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from .models import List, ListItem
+# from .utils import send_due_tasks_email  # Make sure to import the email utility function
+
+User = get_user_model()
+
 def login_request(request):
-	if request.method == "POST":
-		form = AuthenticationForm(request, data=request.POST)
-		if form.is_valid():
-			username = form.cleaned_data.get('username')
-			password = form.cleaned_data.get('password')
-			user = authenticate(username=username, password=password)
-			if user is not None:
-				login(request, user)
-				messages.info(request, f"You are now logged in as {username}.")
-				return redirect("todo:index")
-			else:
-				messages.error(request,"Invalid username or password.")
-		else:
-			messages.error(request,"Invalid username or password.")
-	form = AuthenticationForm()
-	return render(request=request, template_name="todo/login.html", context={"login_form":form})
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+
+            user_id = User.objects.get(username=username).id
+            print(username)
+            print(user)
+            print(user_id)
+
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+
+                # Step 1: Retrieve the user ID from the User model based on the username
+                # user_id = User.objects.get(username=username).id
+
+                # Step 2: Get lists owned by this user based on user_id
+                user_lists = List.objects.filter(user_id_id=user_id).values_list('id', flat=True)
+                print(user_lists)
+
+                # Step 3: Get due tasks from ListItem where list_id is in user_lists
+                today = timezone.now().date()
+                print(today)
+                due_tasks = ListItem.objects.filter(
+                    list_id__in=user_lists,  # Use __in to filter by multiple list IDs
+                    due_date__gt=today,       # Tasks that are due after today
+                    is_done=False             # Only include incomplete tasks
+                )
+
+                print(due_tasks)
+
+                # Step 4: Send email if there are due tasks
+                if due_tasks.exists():
+                    send_due_tasks_email(user, due_tasks)
+
+                return redirect("todo:index")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="todo/login.html", context={"login_form": form})
+
+
+
+
+
+
+
+
+
+
 
 
 # Logout a user
@@ -521,50 +595,6 @@ from django.utils import timezone
 from .models import ListItem  # Ensure this line correctly imports your ListItem model
 
 
-# def user_analytics(request):
-#     today = timezone.now().date()
-    
-#     # Total tasks
-#     total_tasks = ListItem.objects.count()
-#     overdue_tasks = ListItem.objects.filter(due_date__lt=today, is_done=False).count()
-#     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
-
-#     # Aggregations for daily, weekly, and monthly completions
-#     daily_completions = ListItem.objects.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
-#     weekly_completions = ListItem.objects.filter(is_done=True).annotate(week=TruncWeek('finished_on')).values('week').annotate(count=Count('id')).order_by('week')
-#     monthly_completions = ListItem.objects.filter(is_done=True).annotate(month=TruncMonth('finished_on')).values('month').annotate(count=Count('id')).order_by('month')
-
-#     # Convert data for Chart.js
-#     daily_data = {
-#         'labels': [item['date'].strftime('%Y-%m-%d') for item in daily_completions],
-#         'counts': [item['count'] for item in daily_completions]
-#     }
-#     weekly_data = {
-#         'labels': [item['week'].strftime('%Y-%W') for item in weekly_completions],
-#         'counts': [item['count'] for item in weekly_completions]
-#     }
-#     monthly_data = {
-#         'labels': [item['month'].strftime('%Y-%m') for item in monthly_completions],
-#         'counts': [item['count'] for item in monthly_completions]
-#     }
-
-#     context = {
-#         'list_items': ListItem.objects.all(),
-
-
-#         'daily_data': daily_data,
-#         'weekly_data': weekly_data,
-#         'monthly_data': monthly_data,
-
-
-#         'due_soon_count': ListItem.objects.filter(due_date__gte=today, is_done=False).count(),
-#         'overdue_count': overdue_tasks,
-#         'completed_count': ListItem.objects.filter(is_done=True).count(),
-#         'overdue_percentage': overdue_percentage,
-#         'today': today
-#     }
-#     return render(request, 'todo/user_analytics.html', context)
-
 from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.utils import timezone
@@ -574,10 +604,10 @@ from .models import ListItem, List
 from django.utils import timezone
 from collections import defaultdict
 
-
 def user_analytics(request):
     user = request.user
     today = timezone.now().date()
+    tomorrow = today + timezone.timedelta(days=1)
 
     # Filter ListItems by lists belonging to the logged-in user
     user_lists = List.objects.filter(user_id=user)
@@ -587,6 +617,9 @@ def user_analytics(request):
     total_tasks = user_list_items.count()
     overdue_tasks = user_list_items.filter(due_date__lt=today, is_done=False).count()
     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    # Due soon tasks for alert
+    due_soon_items = user_list_items.filter(due_date=tomorrow, is_done=False)
 
     # Aggregations for daily, weekly, and monthly completions
     daily_completions = user_list_items.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
@@ -609,7 +642,7 @@ def user_analytics(request):
 
     total_procrastination_hours = 0
     procrastination_count = 0
-    
+
     for item in user_list_items:
         if item.is_done and item.due_date and item.finished_on:
             # Convert due_date to an aware datetime object
@@ -655,7 +688,41 @@ def user_analytics(request):
         'overdue_percentage': overdue_percentage,
         'avg_procrastination_hours': avg_procrastination_hours,
         'busy_days': busy_days,
-        'today': today
+        'today': today,
+        'due_soon_items': due_soon_items  # Add due soon items for alert
     }
 
     return render(request, 'todo/user_analytics.html', context)
+
+
+
+
+from celery import shared_task
+from django.core.mail import send_mail
+
+# @shared_task
+# def send_async_email(subject, message, recipient_list):
+
+#     send_mail(subject, message, 'your_email@example.com', recipient_list)
+
+
+
+
+
+# from django.core.mail import send_mail
+# from django.conf import settings
+import smtplib
+
+def send_due_tasks_email(user, tasks):
+    print(tasks)
+    subject = "Tasks Due Notification"
+    message = f"Hello {user.username},\n\nHere are your tasks that are due:\n\n"
+    for task in tasks:
+        print(task.item_name, task.due_date)
+        message += "- {} due on {}\n".format(task.item_name, task.due_date)
+    message += "\nPlease complete them on time!"
+    print('SENDING EMAIL TO', user.email)
+    print('MESSAGE: ', message)
+    
+
+
