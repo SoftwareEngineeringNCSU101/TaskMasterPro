@@ -23,6 +23,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
+from django.utils.safestring import mark_safe
 
 
 # Render the home page with users' to-do lists
@@ -511,60 +512,6 @@ def password_reset_request(request):
     return render(request=request, template_name="todo/password/password_reset.html", context={"password_reset_form":password_reset_form})
 
 
-# views.py
-from django.shortcuts import render
-from .models import ListItem
-from django.shortcuts import render
-from django.db.models import Count
-from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.utils import timezone
-from .models import ListItem  # Ensure this line correctly imports your ListItem model
-
-
-# def user_analytics(request):
-#     today = timezone.now().date()
-    
-#     # Total tasks
-#     total_tasks = ListItem.objects.count()
-#     overdue_tasks = ListItem.objects.filter(due_date__lt=today, is_done=False).count()
-#     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
-
-#     # Aggregations for daily, weekly, and monthly completions
-#     daily_completions = ListItem.objects.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
-#     weekly_completions = ListItem.objects.filter(is_done=True).annotate(week=TruncWeek('finished_on')).values('week').annotate(count=Count('id')).order_by('week')
-#     monthly_completions = ListItem.objects.filter(is_done=True).annotate(month=TruncMonth('finished_on')).values('month').annotate(count=Count('id')).order_by('month')
-
-#     # Convert data for Chart.js
-#     daily_data = {
-#         'labels': [item['date'].strftime('%Y-%m-%d') for item in daily_completions],
-#         'counts': [item['count'] for item in daily_completions]
-#     }
-#     weekly_data = {
-#         'labels': [item['week'].strftime('%Y-%W') for item in weekly_completions],
-#         'counts': [item['count'] for item in weekly_completions]
-#     }
-#     monthly_data = {
-#         'labels': [item['month'].strftime('%Y-%m') for item in monthly_completions],
-#         'counts': [item['count'] for item in monthly_completions]
-#     }
-
-#     context = {
-#         'list_items': ListItem.objects.all(),
-
-
-#         'daily_data': daily_data,
-#         'weekly_data': weekly_data,
-#         'monthly_data': monthly_data,
-
-
-#         'due_soon_count': ListItem.objects.filter(due_date__gte=today, is_done=False).count(),
-#         'overdue_count': overdue_tasks,
-#         'completed_count': ListItem.objects.filter(is_done=True).count(),
-#         'overdue_percentage': overdue_percentage,
-#         'today': today
-#     }
-#     return render(request, 'todo/user_analytics.html', context)
-
 from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.utils import timezone
@@ -644,6 +591,17 @@ def user_analytics(request):
         else:
             busy_days[due_date] = 'Not Busy'
     print(busy_days)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
+
     context = {
         'list_items': user_list_items,
         'daily_data': daily_data,
@@ -655,7 +613,8 @@ def user_analytics(request):
         'overdue_percentage': overdue_percentage,
         'avg_procrastination_hours': avg_procrastination_hours,
         'busy_days': busy_days,
-        'today': today
+        'today': today,
+        'calendar_events': mark_safe(json.dumps(calendar_events))
     }
 
     return render(request, 'todo/user_analytics.html', context)
