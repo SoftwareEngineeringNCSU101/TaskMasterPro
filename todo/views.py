@@ -446,40 +446,12 @@ def register_request(request):
     form = NewUserForm()
     return render(request=request, template_name="todo/register.html", context={"register_form":form})
 
-
-# Login a user
-
-# List.objects.filter(user_id_id=request.user.id).order_by('-updated_on')
-
-# def login_request(request):
-# 	if request.method == "POST":
-# 		form = AuthenticationForm(request, data=request.POST)
-# 		if form.is_valid():
-# 			username = form.cleaned_data.get('username')
-# 			password = form.cleaned_data.get('password')
-# 			user = authenticate(username=username, password=password)
-# 			if user is not None:
-# 				login(request, user)
-# 				messages.info(request, f"You are now logged in as {username}.")
-# 				return redirect("todo:index")
-# 			else:
-# 				messages.error(request,"Invalid username or password.")
-# 		else:
-# 			messages.error(request,"Invalid username or password.")
-# 	form = AuthenticationForm()
-# 	return render(request=request, template_name="todo/login.html", context={"login_form":form})
-
-
-
-
-
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from .models import List, ListItem
-# from .utils import send_due_tasks_email  # Make sure to import the email utility function
 
 User = get_user_model()
 
@@ -529,17 +501,6 @@ def login_request(request):
             messages.error(request, "Invalid username or password.")
     form = AuthenticationForm()
     return render(request=request, template_name="todo/login.html", context={"login_form": form})
-
-
-
-
-
-
-
-
-
-
-
 
 # Logout a user
 def logout_request(request):
@@ -699,18 +660,6 @@ def user_analytics(request):
 
 from celery import shared_task
 from django.core.mail import send_mail
-
-# @shared_task
-# def send_async_email(subject, message, recipient_list):
-
-#     send_mail(subject, message, 'your_email@example.com', recipient_list)
-
-
-
-
-
-# from django.core.mail import send_mail
-# from django.conf import settings
 import smtplib
 
 def send_due_tasks_email(user, tasks):
