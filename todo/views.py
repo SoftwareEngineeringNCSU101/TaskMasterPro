@@ -673,5 +673,13 @@ def send_due_tasks_email(user, tasks):
     print('SENDING EMAIL TO', user.email)
     print('MESSAGE: ', message)
     
-
+    # creates SMTP session
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    # start TLS for security
+    s.starttls()
+    # Authentication
+    s.login("patilharshvardhan0508@gmail.com", "axhw zdeb arbn tffc")
+    s.sendmail("patilharshvardhan0508@gmail.com", user.email, message)
+    # terminating the session
+    s.quit()
 
