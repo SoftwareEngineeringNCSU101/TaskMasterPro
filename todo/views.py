@@ -475,26 +475,61 @@ def register_request(request):
     form = NewUserForm()
     return render(request=request, template_name="todo/register.html", context={"register_form":form})
 
+from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from .models import List, ListItem
 
-# Login a user
+User = get_user_model()
+
 def login_request(request):
-	if request.method == "POST":
-		form = AuthenticationForm(request, data=request.POST)
-		if form.is_valid():
-			username = form.cleaned_data.get('username')
-			password = form.cleaned_data.get('password')
-			user = authenticate(username=username, password=password)
-			if user is not None:
-				login(request, user)
-				messages.info(request, f"You are now logged in as {username}.")
-				return redirect("todo:index")
-			else:
-				messages.error(request,"Invalid username or password.")
-		else:
-			messages.error(request,"Invalid username or password.")
-	form = AuthenticationForm()
-	return render(request=request, template_name="todo/login.html", context={"login_form":form})
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
 
+            user_id = User.objects.get(username=username).id
+            print(username)
+            print(user)
+            print(user_id)
+
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+
+                # Step 1: Retrieve the user ID from the User model based on the username
+                # user_id = User.objects.get(username=username).id
+
+                # Step 2: Get lists owned by this user based on user_id
+                user_lists = List.objects.filter(user_id_id=user_id).values_list('id', flat=True)
+                print(user_lists)
+
+                # Step 3: Get due tasks from ListItem where list_id is in user_lists
+                today = timezone.now().date()
+                print(today)
+                due_tasks = ListItem.objects.filter(
+                    list_id__in=user_lists,  # Use __in to filter by multiple list IDs
+                    due_date__gt=today,       # Tasks that are due after today
+                    is_done=False             # Only include incomplete tasks
+                )
+
+                print(due_tasks)
+
+                # Step 4: Send email if there are due tasks
+                if due_tasks.exists():
+                    send_due_tasks_email(user, due_tasks)
+
+                return redirect("todo:index")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="todo/login.html", context={"login_form": form})
 
 # Logout a user
 def logout_request(request):
@@ -557,6 +592,7 @@ import datetime
 def user_analytics(request):
     user = request.user
     today = timezone.now().date()
+    tomorrow = today + timezone.timedelta(days=1)
 
     # Filter ListItems by lists belonging to the logged-in user
     user_lists = List.objects.filter(user_id=user)
@@ -566,6 +602,9 @@ def user_analytics(request):
     total_tasks = user_list_items.count()
     overdue_tasks = user_list_items.filter(due_date__lt=today, is_done=False).count()
     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    # Due soon tasks for alert
+    due_soon_items = user_list_items.filter(due_date=tomorrow, is_done=False)
 
     # Aggregations for daily, weekly, and monthly completions
     daily_completions = user_list_items.filter(is_done=True).annotate(date=TruncDay('finished_on')).values('date').annotate(count=Count('id')).order_by('date')
@@ -656,7 +695,37 @@ def user_analytics(request):
         'avg_completion_time_hours': avg_completion_time_hours,
         'busy_days': busy_days,
         'today': today,
-        'calendar_events': mark_safe(json.dumps(calendar_events))
+        'calendar_events': mark_safe(json.dumps(calendar_events)),
+        'due_soon_items': due_soon_items  # Add due soon items for alert
     }
 
     return render(request, 'todo/user_analytics.html', context)
+
+
+
+
+from celery import shared_task
+from django.core.mail import send_mail
+import smtplib
+
+def send_due_tasks_email(user, tasks):
+    print(tasks)
+    subject = "Tasks Due Notification"
+    message = f"Hello {user.username},\n\nHere are your tasks that are due:\n\n"
+    for task in tasks:
+        print(task.item_name, task.due_date)
+        message += "- {} due on {}\n".format(task.item_name, task.due_date)
+    message += "\nPlease complete them on time!"
+    print('SENDING EMAIL TO', user.email)
+    print('MESSAGE: ', message)
+    
+    # creates SMTP session
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    # start TLS for security
+    s.starttls()
+    # Authentication
+    s.login("patilharshvardhan0508@gmail.com", "axhw zdeb arbn tffc")
+    s.sendmail("patilharshvardhan0508@gmail.com", user.email, message)
+    # terminating the session
+    s.quit()
+

@@ -228,7 +228,6 @@
             max-width: 1100px;
             margin: auto;
         }
-        
         .accent-bar {
             position: absolute;
             left: 0;
@@ -464,15 +463,13 @@
                         <li class="list-item completed">
                             <strong>{{ item.item_name }}</strong><br>
                             <span class="item-details">Created On: {{ item.created_on }}</span><br>
-                            <span class="item-details">Completed On: {{ item.finished_on }}</span><br>
+                            <span class="item-details">Due Date: {{ item.due_date }}</span><br>
                             <span class="item-details">Status: Completed</span>
                         </li>
                     {% endif %}
                 {% endfor %}
             </ul>
         </div>
-
-        
     </div>
 </div>
 </body>
