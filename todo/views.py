@@ -561,12 +561,10 @@ def password_reset_request(request):
     return render(request=request, template_name="todo/password/password_reset.html", context={"password_reset_form":password_reset_form})
 
 
+# views.py
+from django.shortcuts import render
 from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.utils import timezone
-from django.shortcuts import render
-from .models import ListItem, List
-# from datetime import datetime, date, timedelta
 from django.utils import timezone
 from collections import defaultdict
 from django.utils import timezone
