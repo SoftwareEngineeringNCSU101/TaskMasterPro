@@ -23,6 +23,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
+from django.utils.safestring import mark_safe
 
 
 # Render the home page with users' to-do lists
@@ -68,6 +69,21 @@ def index(request, list_id=0):
     cur_date = datetime.date.today()
     for list_item in latest_list_items:       
         list_item.color = "#FF0000" if cur_date > list_item.due_date else "#000000"
+    
+    # Filter ListItems by lists belonging to the logged-in user
+    user = request.user
+    user_lists = List.objects.filter(user_id=user)
+    user_list_items = ListItem.objects.filter(list__in=user_lists)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
             
     context = {
         'latest_lists': latest_lists,
@@ -75,6 +91,7 @@ def index(request, list_id=0):
         'templates': saved_templates,
         'list_tags': list_tags,
         'shared_list': shared_list,
+        'calendar_events': mark_safe(json.dumps(calendar_events))
     }
     return render(request, 'todo/index.html', context)
 
@@ -179,23 +196,35 @@ def updateListItem(request, item_id):
     if not request.user.is_authenticated:
         return redirect("/login")
     if request.method == 'POST':
-        updated_text = request.POST['note']
-        # print(request.POST)
-        print(updated_text)
-        print(item_id)
-        if item_id <= 0:
-            return redirect("index")
         try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            updated_text = data.get('note')
+
+            if not updated_text:
+                return JsonResponse({"success": False, "message": "Note content is missing"}, status=400)
+
+            if item_id <= 0:
+                return JsonResponse({"success": False, "message": "Invalid item ID"}, status=400)
+
+            # Update the item in the database within a transaction
             with transaction.atomic():
                 todo_list_item = ListItem.objects.get(id=item_id)
                 todo_list_item.item_text = updated_text
                 todo_list_item.save(force_update=True)
+
+            # Return a JSON response indicating success
+            return JsonResponse({"success": True, "message": "Note updated successfully"})
+
+        except ListItem.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Item not found"}, status=404)
         except IntegrityError as e:
             print(str(e))
-            print("unknown error occurs when trying to update todo list item text")
-        return redirect("/")
+            return JsonResponse({"success": False, "message": "Database error occurred"}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Invalid JSON data"}, status=400)
     else:
-        return redirect("index")
+        return JsonResponse({"success": False, "message": "Invalid request method"}, status=405)
 
 
 # Add a new to-do list item, called by javascript function
@@ -511,16 +540,6 @@ def password_reset_request(request):
     return render(request=request, template_name="todo/password/password_reset.html", context={"password_reset_form":password_reset_form})
 
 
-# views.py
-from django.shortcuts import render
-from .models import ListItem
-from django.shortcuts import render
-from django.db.models import Count
-from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.utils import timezone
-from .models import ListItem  # Ensure this line correctly imports your ListItem model
-
-
 from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.utils import timezone
@@ -634,6 +653,17 @@ def user_analytics(request):
             busy_days[due_date] = 'Moderately Busy'
         else:
             busy_days[due_date] = 'Not Busy'
+    print(busy_days)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
 
     context = {
         'list_items': user_list_items,
@@ -647,7 +677,8 @@ def user_analytics(request):
         'avg_procrastination_hours': avg_procrastination_hours,
         'avg_completion_time_hours': avg_completion_time_hours,
         'busy_days': busy_days,
-        'today': today
+        'today': today,
+        'calendar_events': mark_safe(json.dumps(calendar_events))
     }
 
     return render(request, 'todo/user_analytics.html', context)
