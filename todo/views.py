@@ -69,6 +69,21 @@ def index(request, list_id=0):
     cur_date = datetime.date.today()
     for list_item in latest_list_items:       
         list_item.color = "#FF0000" if cur_date > list_item.due_date else "#000000"
+    
+    # Filter ListItems by lists belonging to the logged-in user
+    user = request.user
+    user_lists = List.objects.filter(user_id=user)
+    user_list_items = ListItem.objects.filter(list__in=user_lists)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
             
     context = {
         'latest_lists': latest_lists,
@@ -76,6 +91,7 @@ def index(request, list_id=0):
         'templates': saved_templates,
         'list_tags': list_tags,
         'shared_list': shared_list,
+        'calendar_events': mark_safe(json.dumps(calendar_events))
     }
     return render(request, 'todo/index.html', context)
 

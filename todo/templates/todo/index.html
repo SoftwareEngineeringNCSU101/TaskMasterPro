@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -528,6 +532,16 @@
     color: #333; /* Darker color on hover */
 }
 
+        #calendar {
+            position: fixed;
+            right: 0;
+            top: 70px;
+            width: 400px;
+            height: 100%;
+            background-color: #f9f9f9;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            }
     </style>
     <meta charset="UTF-8">
     <title>To-Done</title>
@@ -565,6 +579,36 @@
         <input type="text" id="sharedUser" placeholder="Share this list with...">
         <span onclick="newTodoList()" class="addTodoList">Add</span>
     </div>
+
+    <div id="calendar">
+        <!-- Calendar content -->
+      </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            
+            // Log to check if the element is found
+            console.log(calendarEl);
+
+            // Parse JSON safely from context
+            var calendarEvents;
+            try {
+                calendarEvents = JSON.parse('{{ calendar_events|escapejs }}');
+                console.log(calendarEvents); // Log the events to verify
+            } catch (e) {
+                console.error('Error parsing calendar events:', e);
+                return;
+            }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: calendarEvents
+            });
+
+            calendar.render();
+        });
+    </script>
 
     <div class="main">
 
