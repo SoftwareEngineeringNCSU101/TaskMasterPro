@@ -1,5 +1,5 @@
 import unittest
-from test_user_analytics import UserAnalyticsTest
+from todo.test_user_analytics import UserAnalyticsTest
 # from test_send_due_tasks_email import SendDueTasksEmailTest
 # from test_login_request import LoginRequestTest
 
