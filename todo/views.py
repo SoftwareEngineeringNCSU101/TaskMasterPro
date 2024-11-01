@@ -493,33 +493,19 @@ def login_request(request):
             user = authenticate(username=username, password=password)
 
             user_id = User.objects.get(username=username).id
-            print(username)
-            print(user)
-            print(user_id)
 
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-
-                # Step 1: Retrieve the user ID from the User model based on the username
-                # user_id = User.objects.get(username=username).id
-
-                # Step 2: Get lists owned by this user based on user_id
                 user_lists = List.objects.filter(user_id_id=user_id).values_list('id', flat=True)
                 print(user_lists)
-
-                # Step 3: Get due tasks from ListItem where list_id is in user_lists
                 today = timezone.now().date()
                 print(today)
                 due_tasks = ListItem.objects.filter(
-                    list_id__in=user_lists,  # Use __in to filter by multiple list IDs
-                    due_date__gt=today,       # Tasks that are due after today
-                    is_done=False             # Only include incomplete tasks
+                    list_id__in=user_lists,  
+                    due_date__gt=today,       
+                    is_done=False             
                 )
-
-                print(due_tasks)
-
-                # Step 4: Send email if there are due tasks
                 if due_tasks.exists():
                     send_due_tasks_email(user, due_tasks)
 
@@ -702,30 +688,26 @@ def user_analytics(request):
     return render(request, 'todo/user_analytics.html', context)
 
 
-
-
 from celery import shared_task
 from django.core.mail import send_mail
-import smtplib
 
 def send_due_tasks_email(user, tasks):
-    print(tasks)
     subject = "Tasks Due Notification"
+    message = create_due_tasks_message(user, tasks)
+
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email="patilharshvardhan0508@gmail.com",
+        recipient_list=[user.email],
+        fail_silently=False,
+    )
+
+def create_due_tasks_message(user, tasks):
     message = f"Hello {user.username},\n\nHere are your tasks that are due:\n\n"
     for task in tasks:
-        print(task.item_name, task.due_date)
         message += "- {} due on {}\n".format(task.item_name, task.due_date)
     message += "\nPlease complete them on time!"
-    print('SENDING EMAIL TO', user.email)
-    print('MESSAGE: ', message)
-    
-    # creates SMTP session
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    # start TLS for security
-    s.starttls()
-    # Authentication
-    s.login("patilharshvardhan0508@gmail.com", "axhw zdeb arbn tffc")
-    s.sendmail("patilharshvardhan0508@gmail.com", user.email, message)
-    # terminating the session
-    s.quit()
+    return message
+
 
