@@ -534,22 +534,13 @@ def password_reset_request(request):
 
 # views.py
 from django.shortcuts import render
-from .models import ListItem
-from django.shortcuts import render
 from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.utils import timezone
-from .models import ListItem  # Ensure this line correctly imports your ListItem model
-
-
-from django.db.models import Count
-from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.utils import timezone
-from django.shortcuts import render
-from .models import ListItem, List
-# from datetime import datetime, date, timedelta
 from django.utils import timezone
 from collections import defaultdict
+from .models import ListItem, List
+import datetime
+
 
 def user_analytics(request):
     user = request.user
@@ -636,7 +627,7 @@ def user_analytics(request):
         'avg_procrastination_hours': avg_procrastination_hours,
         'busy_days': busy_days,
         'today': today,
-        'due_soon_items': due_soon_items  # Add due soon items for alert
+        'due_soon_items': due_soon_items  
     }
 
     return render(request, 'todo/user_analytics.html', context)
