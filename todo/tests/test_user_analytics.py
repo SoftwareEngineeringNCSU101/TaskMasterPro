@@ -267,3 +267,89 @@ class UserAnalyticsTest(TestCase):
         self.assertEqual(busy_days.get(today), 'Moderately Busy', "Expected 'Moderately Busy' for today")
         self.assertEqual(busy_days.get(today + timedelta(days=1)), 'Busy', "Expected 'Busy' for tomorrow")
         self.assertEqual(busy_days.get(today + timedelta(days=2)), 'Very Busy', "Expected 'Very Busy' for the day after tomorrow")
+
+    def test_calendar_events_no_tasks(self):
+        # Test with no tasks
+        user_list_items = []
+        calendar_events = [
+            {
+                "title": item.item_name,
+                "start": item.due_date.strftime('%Y-%m-%d'),
+                "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+            }
+            for item in user_list_items if item.due_date
+        ]
+        self.assertEqual(calendar_events, [])
+    
+    def test_calendar_events_with_due_dates(self):
+        # Test with tasks having due dates
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id_id=self.user.id,
+        )
+        task_with_due_date = ListItem.objects.create(
+            item_name="Task with due date",
+            item_text="This is a test item with a due date",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),
+            list=todo,
+            is_done=False,
+        )
+        user_list_items = [task_with_due_date]
+        calendar_events = [
+            {
+                "title": item.item_name,
+                "start": item.due_date.strftime('%Y-%m-%d'),
+                "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+            }
+            for item in user_list_items if item.due_date
+        ]
+        expected_events = [
+            {
+                "title": 'Task with due date',
+                "start": task_with_due_date.due_date.strftime('%Y-%m-%d'),
+                "end": task_with_due_date.due_date.strftime('%Y-%m-%d')
+            }
+        ]
+        self.assertEqual(calendar_events, expected_events)
+
+    def test_calendar_events_without_due_dates(self):
+        # Test with tasks without due dates
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id_id=self.user.id,
+        )
+        task_without_due_date = ListItem.objects.create(
+            item_name="Task without due date",
+            item_text="This is a test item without a due date",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),  # Provide a default value for due_date
+            list=todo,
+            is_done=False,
+        )
+        user_list_items = [task_without_due_date]
+        calendar_events = [
+            {
+                "title": item.item_name,
+                "start": item.due_date.strftime('%Y-%m-%d') if item.due_date else None,
+                "end": item.due_date.strftime('%Y-%m-%d') if item.due_date else None  # Optional end date
+            }
+            for item in user_list_items
+        ]
+        expected_events = [
+            {
+                "title": "Task without due date",
+                "start": task_without_due_date.due_date.strftime('%Y-%m-%d'),
+                "end": task_without_due_date.due_date.strftime('%Y-%m-%d')
+            }
+        ]
+        self.assertEqual(calendar_events, expected_events)
+

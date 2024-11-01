@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Calibri, Helvetica, sans-serif;
-            margin: 0;
         }
 
         ul {
@@ -12,42 +17,78 @@
             padding-left: 0;
         }
 
-        .topbar {
-            overflow: hidden;
-            background-color: #0fa662;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1;
-        }
+        /* Topbar styles */
+.topbar {
+    background-color: #1458a0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .topbar a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding-left: 15px;
-            text-decoration: none;
-            font-size: 25px;
-            padding: 10px;
-        }
+/* Styling for links in the topbar */
+.topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    margin-right: 20px;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
 
-        /* Change the color of links on hover */
-        .topbar a.tabs:hover {
-          color: #ccc;
-        }
+/* Links hover effect */
+.topbar a:hover {
+    color: #ccc;
+    background-color: rgba(255, 255, 255, 0.2);
+}
 
-        .topbar ul {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            display: inline-block;
-        }
+/* Flexbox for horizontal alignment */
+.topbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
 
-        .topbar ul li {
-            display: inline-block;
-            color: #f2f2f2;
-            text-align: center;
-        }
+/* Style for each list item */
+.topbar ul li {
+    margin: 0 15px;
+}
+
+/* Responsiveness: adjust padding and font size for smaller screens */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 10px 15px;
+    }
+    
+    .topbar a {
+        font-size: 18px;
+        margin-right: 10px;
+    }
+    
+    .topbar ul li {
+        margin: 0 10px;
+    }
+}
+
+/* Further responsiveness for very small devices */
+@media (max-width: 480px) {
+    .topbar a {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .topbar ul li {
+        margin: 0 8px;
+    }
+}
 
         .sidenav {
             height: 100%;
@@ -55,15 +96,20 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #eee;
+            background-color: #babadf;
             overflow-x: hidden;
-            padding-top: 10px;
+            padding-top: 20px;
             margin: 0;
             margin-top: 49px;
         }
 
         .sidenav li:hover {
           background: #ddd;
+          padding: 10px;
+        }
+        .sidenav li {
+          text-align: center;
+          padding-top: 5px;
         }
 
         .sidenav a {
@@ -154,6 +200,7 @@
           font-size: 18px;
           transition: 0.2s;
           border-radius: 10px; /* does rounded edges on list items */
+          
 
           /* make the list items unselectable */
           -webkit-user-select: none;
@@ -281,7 +328,7 @@
             <li><a href="/">To-Done</a></li>
             <li><a class="tabs" href="/todo">Lists</a></li>
             <li><a class="tabs" href="/templates">Templates</a></li>
-            <li><a class="tabs" href="/templates">User-Analytics</a></li>
+            <li><a class="tabs" href="/user_analytics">User-Analytics</a></li>
         </ul>
 		<ul style="float: right;">
 		{% if user.is_authenticated %}

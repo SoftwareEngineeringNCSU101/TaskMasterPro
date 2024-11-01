@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Calibri, Helvetica, sans-serif;
-            margin: 0;
         }
 
         ul {
@@ -12,432 +21,527 @@
             padding-left: 0;
         }
 
-        .topbar {
-            overflow: hidden;
-            background-color: #0fa662;
+        /* Topbar styles */
+.topbar {
+    background-color: #1458a0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for links in the topbar */
+.topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    margin-right: 20px;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Links hover effect */
+.topbar a:hover {
+    color: #ccc;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Flexbox for horizontal alignment */
+.topbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Style for each list item */
+.topbar ul li {
+    margin: 0 15px;
+}
+
+/* Responsiveness: adjust padding and font size for smaller screens */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 10px 15px;
+    }
+    
+    .topbar a {
+        font-size: 18px;
+        margin-right: 10px;
+    }
+    
+    .topbar ul li {
+        margin: 0 10px;
+    }
+}
+
+/* Further responsiveness for very small devices */
+@media (max-width: 480px) {
+    .topbar a {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .topbar ul li {
+        margin: 0 8px;
+    }
+}
+
+        
+/* Sidebar (sidenav) styles */
+.sidenav {
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #babadf;
+    padding-top: 20px; /* Enough padding to clear the topbar height */
+    margin-top: 60px; /* Adjusted to match the topbar height */
+    padding-left: 10px;
+    overflow-x: hidden;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 99; /* Make sure the sidebar is below the topbar */
+    transition: width 0.3s ease;
+}
+
+/* Sidebar list items */
+.sidenav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px;
+}
+
+.sidenav ul li {
+    padding: 12px 20px;
+    color: #333;
+    text-align: left;
+    font-size: 18px;
+    transition: background 0.3s ease;
+}
+
+/* Sidebar link styles */
+.sidenav a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    display: block;
+    padding: 10px 20px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Sidebar hover effects */
+.sidenav a:hover {
+    background-color: #e2e2e2;
+    color: #0fa662;
+}
+
+.sidenav li:hover {
+    background-color: #ddd;
+}
+
+/* Input fields inside the sidebar */
+.sidenav input[type=text],
+.sidenav select {
+    width: 90%;
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Add button for todo lists */
+.sidenav .addTodoList {
+    padding: 12px 20px; /* Slightly larger padding for a better feel */
+    background: #0fa662;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 80%; /* Adjust width to make the button smaller */
+    margin: 30px auto; /* Centers the button horizontally */
+    display: block; /* Ensures it's treated as a block element for centering */
+}
+
+.sidenav .addTodoList:hover {
+    background-color: #04502e;
+}
+
+/* Divider (hr) styling */
+.sidenav hr {
+    border: none;
+    height: 1px;
+    background-color: #0fa662;
+    margin: 30px 5%;
+}
+
+/* Main content area styling */
+.main {
+    margin-left: 300px; /* Adjusted margin-left to match the width of the left sidebar */
+    margin-right: 500px; /* Right margin for right sidebar */
+    padding: 20px;
+    font-size: 20px;
+    margin-top: 70px; /* Top margin to ensure it doesn't overlap with the topbar */
+    background-color: #fff;
+    transition: margin 0.3s ease;
+}
+
+/* Links inside the main content */
+.main h2 a {
+    text-decoration: none;
+    color: #0fa662;
+    display: block;
+    padding-left: 5px;
+    transition: color 0.3s ease;
+}
+
+.main h2 a:hover {
+    color: #0b8f54;
+}
+
+/* Message when no lists are available */
+#noListYet {
+    text-decoration: none;
+    color: #0fa662;
+    display: block;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+/* Ensures that all children of .main adhere to the box-sizing rule */
+.main * {
+    box-sizing: border-box;
+}
+
+/* Removes padding and margins from unordered lists */
+.main ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Styling for list items */
+.main ul li {
+    position: relative;
+    padding: 12px 20px 12px 40px; /* Spacing for the checkbox */
+    list-style-type: none;
+    background: #f9f9f9;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Label styling */
+.main ul li label {
+    flex-grow: 1;
+    display: inline-block;
+}
+
+/* Hover effect for list items */
+.main ul li:hover {
+    background: #ddd;
+}
+
+/* Completed task (done) styling */
+.main ul li.done {
+    background-color: #3d3939;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+/* Close button for each list item */
+.main ul li .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #000;
+    background-color: transparent;
+    border: none;
+    padding: 8px;
+    transition: color 0.3s ease;
+}
+
+.main ul li .close:hover {
+    color: #f44336;
+}
+
+
+/* Header styling */
+.main .header {
+    color: black;
+    display: block;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Ensures clear floats after header */
+.main .header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Input field for text */
+.main input[type=text] {
+    border: none;
+    border-radius: 10px;
+    width: 75%;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: inset 1px 1px 5px #555;
+    margin-bottom: 10px;
+}
+
+/* Input field for date */
+.main input[type=date] {
+    border: none;
+    border-radius: 10px;
+    width: 75%;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: inset 1px 1px 5px #555;
+    margin-bottom: 10px;
+}
+
+/* Input field for color selection */
+.main input[type=color] {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Checkbox styling within list items */
+.main ul li input[type=checkbox] {
+    position: relative;
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+
+/* Add button styling */
+.main .addBtn {
+    padding: 9px;
+    width: 30%;
+    background: #0fa662;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 30px auto; /* Centers the button horizontally */
+    display: block; /* Ensures it's treated as a block element for centering */
+}
+
+.main .addBtn:hover {
+    background-color: #bbb;
+}
+
+/* Button styling remains the same */
+.main .add-template-button {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    background: #0fa662;
+    border: 0;
+    font-size: 16px;
+    height: 37px;
+    padding: 0 20px;
+    text-align: center;
+    width: auto;
+    font-weight: 500;
+    color: #f9f9f9;
+    margin: 10px;
+}
+
+.main .add-template-button.delete {
+    background: #a81a0f;
+}
+
+.main .add-template-button:hover {
+    background: #0b8f54;
+}
+
+.main .add-template-button.delete:hover {
+    background: #d11a1a;
+}
+
+/* Flex container to align forms side by side */
+.button-container {
+    display: flex;
+    justify-content: center; /* Aligns buttons at the center */
+    gap: 10px; /* Adds spacing between buttons */
+    margin-top: 20px;
+}
+
+
+/* Customize color button styling */
+.main .add-cust-color-button {
+    position: absolute;
+    right: 50px;
+    top: 0;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    background: #0fa662;
+    color: #f9f9f9;
+    border: 0;
+    font-size: 16px;
+    height: 37px;
+    padding: 0 11px;
+    margin-top: 5px;
+    width: 10%;
+    text-align: center;
+    min-width: 100px;
+    font-weight: 300;
+}
+
+.main .add-cust-color-button:hover {
+    background: #0b8f54;
+}
+
+/* Tag template styling */
+.tag-template {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid #0fa662;
+    font-size: 16px;
+    height: 40px;
+    text-align: center;
+    width: fit-content;
+    font-weight: 500;
+    color: #0fa662;
+    margin: 10px;
+}
+
+
+    /* Shared list style */
+    .shared-list {
+    color: black;
+    font-size: 12px;
+    margin-top: 5px;
+    padding-left: 5px;
+    }
+
+    /* Flashcard styling */
+    .flashcard {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Card shadow effect */
+    transition: box-shadow 0.3s ease;
+    width: 100%;
+    }
+
+    .flashcard:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Larger shadow on hover */
+    }
+
+
+    /* Flashcard labels */
+    .flashcard label {  
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    }
+
+    /* Flashcard flex container for inputs and buttons */
+    .flashcard .flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .popup-container {
+    display: none; /* Hidden by default */
+    position: relative;
+    background-color: #f9f9f9; /* Light background for readability */
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 95%;
+    max-width: 500px; /* Limit max width for cleaner look */
+}
+
+.popup-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-container label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.popup-container textarea {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.popup-container .save-button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.popup-container .save-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.popup-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+}
+
+.popup-close-btn:hover {
+    color: #333; /* Darker color on hover */
+}
+
+        #calendar {
             position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1;
-        }
-
-        .topbar a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding-left: 15px;
-            text-decoration: none;
-            font-size: 25px;
-            padding: 10px;
-        }
-
-        /* Change the color of links on hover */
-        .topbar li a.tabs:hover {
-          color: #ccc;
-        }
-
-        .topbar ul {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .topbar ul li {
-            display: inline-block;
-            color: #f2f2f2;
-            text-align: center;
-        }
-
-        .sidenav {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #eee;
-            overflow-x: hidden;
-            padding-top: 15px;
-            margin: 0;
-            margin-top: 49px;
-        }
-
-        .sidenav li:hover {
-          background: #ddd;
-        }
-
-        .sidenav a {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
-
-        .sidenav a:hover {
-            color: #0fa662;
-        }
-
-        .sidenav input[type=text] {
-          border:none;
-          border-radius: 10px;
-          width: 200px;
-          margin-left: 10px;
-          margin-top: 5px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
-
-        .sidenav div {
-          width: 220px;
-          margin-left: 10px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-        }
-
-        #listTags {
-          border:none;
-          border-radius: 10px;
-          /* width: 175px; */
-          margin-left: 10px;
-          padding: 10px;
-          float: left;
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
-
-        #newListTag{
-            border:none;
-            border-radius: 10px;
-            width: 60%;
-            margin-left: 10px;
-            padding: 10px;
-            float: left;
-            font-size: 16px;
-            box-shadow: 1px 1px 5px #555 inset;
-            white-space: nowrap;
-            display: block;
-        }
-
-        .sidenav .addTodoList {
-          padding: 9px;
-          width: 17%;
-          background: #d9d9d9;
-          color: #555;
-          float: right;
-          margin-top: 5px;
-          text-align: center;
-          font-size: 16px;
-          cursor: pointer;
-          transition: 0.3s;
-          border-radius: 10px;
-          display: block;
-        }
-
-        .sidenav .addTodoList:hover {
-          background-color: #bbb;
-        }
-
-        .sidenav hr {
-            margin-top: 50px;
-            height: 2px;
-            background-color: #0fa662;
-            border: none;
-            width: 87%;
-            display: block;
-        }
-
-        .rightsidebar hr {
-            height: 2px;
-            background-color: #0fa662;
-            border: none;
-            width: 87%;
-        }
-
-        .rightsidebar {
-            height: 100%;
-            width: 350px;
-            margin-top: 49px;
-            position: fixed;
-            top: 0;
             right: 0;
-            background-color: #eee;
-            overflow-x: hidden;
-            padding-top: 10px;
-            padding-right: 10px;
-            {#margin: 0;#}
-        }
-
-        .rightsidebar a {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
-
-        .rightsidebar form {
-            padding: 6px 8px 6px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #000000;
-            display: block;
-        }
-
-        .rightsidebar textarea {
-            width: 325px;
-        }
-
-        .rightsidebar .save-button {
-            padding: 9px;
-            background: #d9d9d9;
-            color: #555;
-            float: left;
-            text-align: center;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 10px;
-            display: inline-block;
-            border: 0;
-            margin-top: 10px;
-        }
-
-        .rightsidebar .save-button:hover {
-          background-color: #bbb;
-        }
-
-        .main {
-            margin-left: 250px; /* Same as the width of the sidenav */
-            margin-right: 350px; /* Same as the width of the sidenav */
-            font-size: 20px;
-            padding: 0px 20px;
-            margin-top: 70px;
-        }
-
-        .main h2 a {
-            text-decoration: none;
-            color: #0fa662;
-            display: block;
-            padding-left: 5px;
-        }
-
-        #noListYet {
-            text-decoration: none;
-            color: #0fa662;
-            display: block;
-            align-items: center;
-        }
-
-
-        /* Include the padding and border in an element's total width and height */
-        .main * {
-          box-sizing: border-box;
-        }
-
-        /* Remove margins and padding from the list */
-        .main ul {
-          margin: 0;
-          padding: 0;
-        }
-
-        /* Style the list items */
-        .main ul li {
-          cursor: pointer;
-          position: relative;
-          padding: 12px 8px 12px 40px;
-          list-style-type: none;
-          background: #f9f9f9;
-          font-size: 18px;
-          transition: 0.2s;
-          border-radius: 10px; /* does rounded edges on list items */
-
-          /* make the list items unselectable */
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-
-        /* Darker background-color on hover */
-        .main ul li:hover {
-          background: #ddd;
-        }
-
-        .main ul li.done {
-          background: #3d3939;
-          color: #fff;
-          text-decoration: line-through;
-        }
-
-        /* Style the close button */
-        .main .close {
-          position: absolute;
-          right: 0;
-          top: 0;
-          padding: 12px 16px 12px 16px;
-          border-radius: 10px;
-        }
-
-        .main .close:hover {
-          background-color: #f44336;
-          color: white;
-        }
-
-        /* Style the header */
-        .main .header {
-          /* color: white; */
-          color: black;
-          display: block;
-        }
-
-        /* Clear floats after the header */
-        .main .header:after {
-          content: "";
-          display: table;
-          clear: both;
-        }
-
-        /* Style the input text*/
-        .main input[type=text] {
-          border: none;
-          border-radius: 10px;
-          width: 75%;
-          padding: 10px;
-          /* float: left; */
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
-
-        /* Style the input date*/
-        .main input[type=date] {
-          border: none;
-          border-radius: 10px;
-          width: 75%;
-          padding: 10px;
-          /* float: left; */
-          font-size: 16px;
-          box-shadow: 1px 1px 5px #555 inset;
-          white-space: nowrap;
-          display: block;
-        }
-	
-	    /* Style the input color*/
-        .main input[type=color] {
-          display: block;
-          margin-bottom: 5px;
-        }
-
-        /* Style the input checkbox within unordered list item */
-        .main ul li input[type=checkbox] {
-          position: absolute;
-          left: 2px;
-          top: 12px;
-          width: 20px;
-          height: 20px;
-          padding: 12px 16px 12px 16px;
-          border-radius: 10px;
-        }
-
-        /* Style the "Add" button */
-        .main .addBtn {
-          padding: 9px;
-          width: 25%;
-          background: #d9d9d9;
-          color: #555;
-          float:left;
-          text-align: center;
-          font-size: 16px;
-          cursor: pointer;
-          transition: 0.3s;
-          border-radius: 10px;
-          display: block;
-        }
-
-        .main .addBtn:hover {
-          background-color: #bbb;
-        }
-
-        .main .add-template-button {
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            background: #0fa662;
-            border: 0;
-            font-size: 16px;
-            height: 37px;
-            padding: 0 11px;
-            margin-top: 5px;
-            text-align: center;
-            width: 100%;
-            min-width: 200px;
-            font-weight: 500;
-            color: #f9f9f9;
-        }
-	
-	     /* Style the "customize" button */
-        .main .add-cust-color-button{
-            position: absolute;
-            right: 50px;
-            top: 0;
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            background: #0fa662;
-            color: #f9f9f9;
-            border: 0;
-            font-size: 16px;
-            height: 37px;
-            padding: 0 11px;
-            margin-top: 5px;
-            width: 10%;
-            text-align: center;
-            min-width: 100px;
-            font-weight: 300;
-        }
-
-        .main .add-cust-color-button:hover{
-            background: #0b8f54;
-        }
-
-        .tag-template {
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 10px;
-            border-color: #0fa662;
-            border: 1;
-            font-size: 16px;
-            height: 40px;
-            text-align: center;
-            width: fit-content;
-            font-weight: 500;
-            color: #0fa662;
-        }
-
-        .main .add-template-button:hover{
-            background: #0b8f54;
-        }
-
-        .add-template-button.delete:hover{
-            background: #a81a0f;
-        }
-
-        .shared-list {
-            color: black;
-            font-size: 12px;
-            margin-top: 5px;
-            padding-left: 5px;
-        }
-
+            top: 70px;
+            width: 400px;
+            height: 100%;
+            background-color: #f9f9f9;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            }
     </style>
     <meta charset="UTF-8">
     <title>To-Done</title>
@@ -461,6 +565,7 @@
 		</ul>
     </div>
     <div class="sidenav">
+        <h3>Create a new todo list</h3>
         <input type="text" id="todoListInput" placeholder="New Todo List">
         <div>Select a tag for your todo list</div>
         <select id="listTags" onchange="toggleNewTagInput()">
@@ -474,6 +579,36 @@
         <input type="text" id="sharedUser" placeholder="Share this list with...">
         <span onclick="newTodoList()" class="addTodoList">Add</span>
     </div>
+
+    <div id="calendar">
+        <!-- Calendar content -->
+      </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            
+            // Log to check if the element is found
+            console.log(calendarEl);
+
+            // Parse JSON safely from context
+            var calendarEvents;
+            try {
+                calendarEvents = JSON.parse('{{ calendar_events|escapejs }}');
+                console.log(calendarEvents); // Log the events to verify
+            } catch (e) {
+                console.error('Error parsing calendar events:', e);
+                return;
+            }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: calendarEvents
+            });
+
+            calendar.render();
+        });
+    </script>
 
     <div class="main">
 
@@ -537,6 +672,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
+    <div class="button-container">
     <form action="/templates/new-from-todo" method="post">
         {% csrf_token %}
         <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
@@ -547,82 +683,82 @@
         <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
         <button class="add-template-button delete" onclick="">Delete</button>
     </form>
+    </div>
 
     {% endfor %}
 
 
-        {% for list in latest_lists %}
-            <div class="header">
-                <h2>
-                    <a href="/todo/{{ list.id }}">{{ list.title_text }} {% if list.list_tag != "none" %}
+    {% for list in latest_lists %}
+    <div class="flashcard">
+        <div class="header">
+            <h2>
+                <a href="/todo/{{ list.id }}">{{ list.title_text }} 
+                    {% if list.list_tag != "none" %}
                         <button type="button" class="tag-template">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag-fill" viewBox="0 0 16 16">
                                 <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                              </svg>
+                            </svg>
                             {{ list.list_tag }}
                         </button>
-                        {% endif %}
-                        {% if list.is_shared == True %}
-                            <img src="https://cdn0.iconfinder.com/data/icons/multimedia-261/32/Send-512.png" title="This To-Do list is shared by you." height="16px" width="16px">
-                        {% endif %}
-                    </a>
-                </h2>
-                <!-- <input type="text" id="{{ "InputText_"|addstr:list.id }}" placeholder="New Task">
-                <span onclick="newElement({{ list.id }})" class="addBtn">Add</span> -->
-                <form>
-                    <div class="form-group">
-                      <label for="{{ "InputText_"|addstr:list.id }}">New Task</label>
-                      <input type="text" class="form-control" id="{{ "InputText_"|addstr:list.id }}">
-                    </div>
-                    <div class="form-group">
-                      <label for="{{ "InputDue_"|addstr:list.id }}">Due Date</label>
-                      <input type="date" class="form-control" id="{{ "InputDue_"|addstr:list.id }}">
-                    </div>
-		            <div class="form-group">
-                        <label for="{{ "InputColor_"|addstr:list.id }}">Color Tag</label>
-                        <input type="color" class="form-control" id="{{ "InputColor_"|addstr:list.id }}" value="#f9f9f9">
-                    </div>
-                </form>
-                <div>
-                    <span onclick="newElement({{ list.id }})" class="addBtn">Add</span>
-                </div>
-            </div>
-            <ul id="{{ "List_"|addstr:list.id }}" class="listItemsUnorderedList">
-                {% for list_item in latest_list_items %}
-                    {% if list_item.list_id == list.id %}
-                        {% if not list_item.is_done %}
-                            <li style="background-color:{{list_item.tag_color}};" class="listItem">
-                        {% else %}
-                             <li style="background-color:{{list_item.tag_color}};" class="listItem done">
-                        {% endif %}
-                        {% if not list_item.is_done %}
-                                <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}">
-                        {% else %}
-                                <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}" checked>
-                        {% endif %}
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}">{{ list_item.item_name }}</label>
-                                <br>
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}" class="text-right">Start date: {{ list_item.created_on }}</label>
-                                <label for="{{ "ListItem_"|addstr:list_item.id }}" style="color:{{list_item.color}};">Due: {{list_item.due_date}}</label>
-                                {% if list_item.is_done == 1%}
-                                    <p> It took you: {{ list_item.finished_on|timeuntil:list_item.created_on }} to complete</p>
-                                {% endif %}
-                                <span class="close">x</span>
-                            </li>
                     {% endif %}
-                {% endfor %}
-            </ul>
-        <form action="/templates/new-from-todo" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
-            <button class="add-template-button" onclick="">Save As Template</button>
+                    {% if list.is_shared == True %}
+                        <img src="https://cdn0.iconfinder.com/data/icons/multimedia-261/32/Send-512.png" title="This To-Do list is shared by you." height="16px" width="16px">
+                    {% endif %}
+                </a>
+            </h2>
+        </div>
+        
+        <form>
+            <div class="form-group">
+                <label for="{{ "InputText_"|addstr:list.id }}">New Task</label>
+                <input type="text" class="form-control" id="{{ "InputText_"|addstr:list.id }}">
+            </div>
+            <div class="form-group">
+                <label for="{{ "InputDue_"|addstr:list.id }}">Due Date</label>
+                <input type="date" class="form-control" id="{{ "InputDue_"|addstr:list.id }}">
+            </div>
+            <div class="form-group">
+                <label for="{{ "InputColor_"|addstr:list.id }}">Color Tag</label>
+                <input type="color" class="form-control" id="{{ "InputColor_"|addstr:list.id }}" value="#f9f9f9">
+            </div>
+            <div>
+                <button type="button" onclick="newElement({{ list.id }})" class="addBtn">Add</button> <!-- Add Button -->
+            </div>
         </form>
-        <form action="/delete-todo" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
-            <button class="add-template-button delete" onclick="">Delete</button>
-        </form>
-        {% endfor %}  
+        
+        <ul id="{{ "List_"|addstr:list.id }}" class="listItemsUnorderedList">
+            {% for list_item in latest_list_items %}
+                {% if list_item.list_id == list.id %}
+                    <li style="background-color:{{list_item.tag_color}};" class="listItem {% if list_item.is_done %}done{% endif %}">
+                        <input type="checkbox" id="{{ "ListItem_"|addstr:list_item.id }}" name="{{ "ListItem_"|addstr:list_item.id }}" value="{{ "ListItem_"|addstr:list_item.id }}" {% if list_item.is_done %}checked{% endif %}>
+                        <label for="{{ "ListItem_"|addstr:list_item.id }}">{{ list_item.item_name }}</label>
+                        <span class="close">x</span>
+                        <br>
+                        <label class="text-right">Start date: {{ list_item.created_on }}</label>
+                        <label style="color:{{list_item.color}};">Due: {{list_item.due_date}}</label>
+                        {% if list_item.is_done == 1 %}
+                            <p> It took you: {{ list_item.finished_on|timeuntil:list_item.created_on }} to complete</p>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <!-- Button Container for Save/Delete buttons -->
+        <div class="button-container">
+            <form action="/templates/new-from-todo" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="todo" id="todo-{{ list.id }}" value="{{ list.id }}">
+                <button class="add-template-button">Save As Template</button>
+            </form>
+            <form action="/delete-todo" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="todo" id="delete-todo-{{ list.id }}" value="{{ list.id }}">
+                <button class="add-template-button delete">Delete</button>
+            </form>
+        </div>
+    </div>
+        {% endfor %}
         {% if not latest_lists %}
             {% if not shared_list %}
         <div class="header">
@@ -632,20 +768,6 @@
         {% endif %}
     </div>
 
-    {% if latest_lists or shared_list %}
-        <ul class="rightsidebar" id = "rightsidebar">
-            <li><a>List name</a></li>
-            <li><a>Item name</a></li>
-            <li hidden><a></a></li>
-            <form action="/updateListItem/0" method="post">
-                <p><label for="note">Note:</label></p>
-                <textarea id="note" name="note" rows="4" cols="50">
-                </textarea>
-                <br>
-                <input class="save-button" type="submit" value="Save">
-            </form>
-        </ul>
-    {% endif %}
 </body>
 <script>
 // Click on a close button to hide the current list item
@@ -671,106 +793,167 @@ function removeListItem() {
     httpRequest.send(JSON.stringify(params))
 }
 
-// When click a list item, restore all othe
 var list = document.getElementsByClassName("listItemsUnorderedList");
-for(let i = 0; i < list.length; i++) {
+
+for (let i = 0; i < list.length; i++) {
     list[i].addEventListener('click', function (ev) {
         if (ev.target.tagName === 'LI') {
-            {#ev.target.classList.toggle('checked');#}
-            // restore all other checked list items
-            for(let k = 0; k < list.length; k++) {
+            // Remove 'checked' class from all list items
+            for (let k = 0; k < list.length; k++) {
                 for (let j = 0; j < list[k].children.length; j++) {
                     if (list[k].children[j].classList.contains('checked') && list[k].children[j] !== ev.target) {
-                        list[k].children[j].classList.remove('checked')
+                        list[k].children[j].classList.remove('checked');
                     }
                 }
             }
-            // show list item name and its note in the right-side bar
 
-            // TODO access database and get list and list item info
-            var item_name = ev.target.children[1].innerHTML
-            // ListItem_{id}, capture id start from index 9
-            var item_id = ev.target.getElementsByTagName("input")[0].id.toString().substring(9)
+            // Check if a popup is already open; if so, close it
+            const existingPopup = document.querySelector('.popup-container');
+            if (existingPopup) existingPopup.remove();
 
-            // this list id will look like List_{id}, so remove the first five letters
-            var list_id = ev.target.parentElement.id.substring(5)
-            var httpRequest = new XMLHttpRequest()
-            {#httpRequest.onreadystatechange = alertContents;#}
+            // Create the popup container
+            const popupContainer = document.createElement('div');
+            popupContainer.className = 'popup-container';
+
+            // Close button for the popup
+            const closeButton = document.createElement('span');
+            closeButton.className = 'popup-close-btn';
+            closeButton.innerHTML = '&times;';
+            closeButton.onclick = function () {
+                popupContainer.remove(); // Close popup on button click
+            };
+            popupContainer.appendChild(closeButton);
+
+            // Extract necessary information for the form action URL
+            const itemName = ev.target.children[1].innerHTML;
+            const itemId = ev.target.getElementsByTagName("input")[0].id.substring(9);
+            const listId = ev.target.parentElement.id.substring(5);
+
+            // Populate popup content (only showing the note form)
+            const content = document.createElement('div');
+            content.innerHTML = `
+                <form id="noteForm_${itemId}" method="post">
+                    <label for="note">Note:</label>
+                    <textarea id="note" name="note" rows="4" cols="50"></textarea>
+                    <input class="save-button" type="button" value="Save">
+                </form>
+                <p id="save-message" style="display: none; color: green; font-size: 12px;">Note saved successfully!</p>
+            `;
+            popupContainer.appendChild(content);
+
+            // Insert the popup below the clicked list item
+            ev.target.insertAdjacentElement('afterend', popupContainer);
+
+            // Show the popup container
+            popupContainer.style.display = "block";
+
+            // Fetch existing note data using AJAX
+            var httpRequest = new XMLHttpRequest();
             httpRequest.onreadystatechange = function() {
-              if (this.readyState === 4 && this.status === 200) {
-                  console.log(this.responseText)
-                  var jsonResponse = JSON.parse(this.responseText)
-                  var rightsidebar = document.getElementById("rightsidebar")
+                if (this.readyState === 4 && this.status === 200) {
+                    var jsonResponse = JSON.parse(this.responseText);
 
-                  var list_title_li_node = rightsidebar.children[0]
-                  var list_text_node = list_title_li_node.children[0]
-                  list_text_node.innerHTML = "List name: " + jsonResponse['list_name']
-
-                  var item_title_li_node = rightsidebar.children[1]
-                  var item_text_node = item_title_li_node.children[0]
-                  item_text_node.innerHTML = "Item name: " + jsonResponse['item_name']
-
-                  var item_form_node = rightsidebar.children[3]
-                  var item_textarea_node = item_form_node.children[1]
-                  item_textarea_node.value = jsonResponse['item_text']
-
-                  // set the action url, append item id parameter to the end of url
-                  var text_form = rightsidebar.getElementsByTagName("form")[0]
-                  text_form.action = "/updateListItem/" + jsonResponse['item_id']
-                {#document.getElementById('demoGet').innerHTML = this.responseText;#}
-              }
+                    // Update the note textarea with the fetched note text
+                    popupContainer.querySelector('#note').value = jsonResponse['item_text'];
+                }
             };
             httpRequest.open('POST', '/getListItemById');
-            httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8")
-            {#var token = {% csrf_token %}#}
+            httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
             var params = {
-                "list_item_name": item_name,
-                "list_id": list_id,
-                "list_item_id": item_id,
-            }
-            httpRequest.send(JSON.stringify(params))
+                "list_item_name": itemName,
+                "list_id": listId,
+                "list_item_id": itemId
+            };
+            httpRequest.send(JSON.stringify(params));
 
+            // Handle note saving via AJAX
+            const form = popupContainer.querySelector(`#noteForm_${itemId}`);
+            const saveButton = form.querySelector('.save-button');
+            saveButton.addEventListener('click', function() {
+                const noteContent = form.querySelector('#note').value;
 
-            // Change the content of right-side bar
+                // Send the note data via AJAX
+                var saveRequest = new XMLHttpRequest();
+                saveRequest.onreadystatechange = function() {
+                    if (saveRequest.readyState === 4 && saveRequest.status === 200) {
+                        console.log('Note saved successfully');
+                        // Keep the updated note content visible
+                        form.querySelector('#note').value = noteContent;
+                        
+                        // Show a success message briefly
+                        const saveMessage = popupContainer.querySelector('#save-message');
+                        saveMessage.style.display = "block";
+                        setTimeout(() => {
+                            saveMessage.style.display = "none";
+                        }, 2000); // Hide message after 2 seconds
+                    }
+                };
+                saveRequest.open('POST', `/updateListItem/${itemId}`);
+                saveRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
+                var saveParams = {
+                    "list_item_id": itemId,
+                    "note": noteContent
+                };
+                saveRequest.send(JSON.stringify(saveParams));
+            });
+
+            // Mark the clicked item as checked
             ev.target.classList.toggle('checked');
-            {#global_count++#}
         }
     }, false);
 }
-
+// Use Array.forEach to add an event listener to each checkbox
 var listItemsCheckBoxes = document.querySelectorAll("input[type=checkbox]");
-{#let enabledSettings = []#}
-/*
-For IE11 support, replace arrow functions with normal functions and
-use a polyfill for Array.forEach:
-https://vanillajstoolkit.com/polyfills/arrayforeach/
-*/
+    listItemsCheckBoxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', markListItemByName)
+    });
+
 
 // mark item as done or undo it
 function markListItemByName() {
     if (this.parentElement.tagName === 'LI') {
+        // Toggle the "done" class for the list item
         this.parentElement.classList.toggle('done');
-        // TODO need to remove the list item from database
-        var item_name = this.nextElementSibling.innerHTML
-        // List_{id}
-        var list_id = this.parentElement.parentElement.id.toString().substring(5)
-        // ListItem_{id}
-        var list_item_id = this.id.toString().substring(9)
-        var httpRequest = new XMLHttpRequest()
-        var is_done = this.parentElement.classList.contains('done')
-        var today = new Date()
-        var finish_on_timestamp = today.getTime() / 1000
-        httpRequest.open('POST', '/markListItem');
-        httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8")
+        
+        // Extract necessary information
+        var item_name = this.nextElementSibling.innerHTML;
+        var list_id = this.parentElement.parentElement.id.toString().substring(5); // Extract list ID
+        var list_item_id = this.id.toString().substring(9); // Extract list item ID
+        var is_done = this.parentElement.classList.contains('done'); // Check if the item is marked as done
+        var today = new Date();
+        var finish_on_timestamp = today.getTime() / 1000; // Get the current timestamp
+        
+        // Create a new XMLHttpRequest object
+        var httpRequest = new XMLHttpRequest();
+        
+        // Set up the POST request to update the item
+        httpRequest.open('POST', '/markListItem', true);
+        httpRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        
+        // Prepare the parameters to be sent in the request body
         var params = {
             "list_id": list_id,
             "list_item_name": item_name,
             "is_done": is_done,
             "list_item_id": list_item_id,
             "finish_on": finish_on_timestamp
-        }
-        httpRequest.send(JSON.stringify(params))
-        window.location.reload();
+        };
+        
+        // Send the request with the parameters as JSON
+        httpRequest.send(JSON.stringify(params));
+        
+        // Handle the response
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState === 4) {
+                if (httpRequest.status === 200) {
+                    // Success: Optionally show a success message or handle UI updates
+                    console.log('Item marked as done/undone successfully');
+                } else {
+                    // Error: Handle error case
+                    console.error('Failed to mark the item. Please try again.');
+                }
+            }
+        };
     }
 }
 

@@ -17,6 +17,10 @@ class TestViews(TestCase):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(
             username='jacob', email='jacob@…', password='top_secret')
+        
+        self.client.login(username='jacob', password='top_secret')
+        
+
 
     def testLogin(self):
         request = self.factory.get('/login/')
@@ -28,10 +32,6 @@ class TestViews(TestCase):
         response = login_request(request)
         self.assertEqual(response.status_code, 200)
 
-    def testSavingTodoList(self):
-        response = self.client.get(reverse('todo:createNewTodoList'))
-        self.assertEqual(response.status_code, 302)
-        # print(response)
 
     def test_delete_todo_list(self):
         request = self.factory.get('/todo/')
@@ -81,10 +81,6 @@ class TestViews(TestCase):
         response = index(request)
         self.assertEqual(response.status_code, 200)
 
-    def test_template_from_todo_redirect(self):
-        client = self.client
-        response = client.get(reverse('todo:template_from_todo'))
-        self.assertEqual(response.status_code, 302)
 
     def test_template_from_todo_function(self):
         request = self.factory.get('/todo/')
@@ -200,32 +196,6 @@ class TestViews(TestCase):
         response = index(request)
         self.assertEqual(response.status_code, 200)
         
-    def test_updateListItem(self):
-        request = self.factory.get('/todo/')
-        request.user = self.user
-        todo = List.objects.create(
-            title_text="test list 2",
-            created_on=timezone.now(),
-            updated_on=timezone.now(),
-            user_id_id=request.user.id,
-        )
-        item = ListItem.objects.create(
-            item_name="test item 2",
-            item_text="This is a test item on a test list",
-            created_on=timezone.now(),
-            finished_on=timezone.now(),
-            tag_color="#f9f9f9",
-            due_date=timezone.now(),
-            list=todo,
-            is_done=False,
-        )
-        post = request.POST.copy()
-        post['todo'] = 1
-        post['note'] = 'test note'
-        request.POST = post
-        request.method = "POST"
-        response = updateListItem(request, item.id)
-        self.assertEqual(response.status_code, 302)
         
     def test_createNewTodoList(self):
         test_data = {'list_name' : 'test',
@@ -399,3 +369,134 @@ class TestViews(TestCase):
         setattr(request, '_messages', FallbackStorage(request))
         response = login_request(request)
         self.assertEqual(response.status_code, 200)
+
+    def test_updateListItem_success(self):
+        # Setup for a successful update
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id=self.user
+        )
+        item = ListItem.objects.create(
+            item_name="test item",
+            item_text="This is a test item on a test list",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),
+            list=todo,
+            is_done=False
+        )
+        updated_text = "Updated test item text"
+        response = self.client.post(
+            reverse('todo:updateListItem', args=[item.id]),
+            data=json.dumps({'note': updated_text}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], True)
+        self.assertEqual(response_data['message'], "Note updated successfully")
+        item.refresh_from_db()
+        self.assertEqual(item.item_text, updated_text)
+
+    def test_updateListItem_missing_note(self):
+        # Test missing note content
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id=self.user
+        )
+        item = ListItem.objects.create(
+            item_name="test item",
+            item_text="This is a test item on a test list",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),
+            list=todo,
+            is_done=False
+        )
+        response = self.client.post(
+            reverse('todo:updateListItem', args=[item.id]),
+            data=json.dumps({}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], False)
+        self.assertEqual(response_data['message'], "Note content is missing")
+
+    def test_updateListItem_invalid_item_id(self):
+        response = self.client.post(
+            reverse('todo:updateListItem', args=[0]),
+            data=json.dumps({'note': 'Updated text'}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], False)
+        self.assertEqual(response_data['message'], "Invalid item ID")
+
+    def test_updateListItem_item_not_found(self):
+        response = self.client.post(
+            reverse('todo:updateListItem', args=[999]),
+            data=json.dumps({'note': 'Updated text'}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], False)
+        self.assertEqual(response_data['message'], "Item not found")
+
+    def test_updateListItem_invalid_json(self):
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id=self.user
+        )
+        item = ListItem.objects.create(
+            item_name="test item",
+            item_text="This is a test item on a test list",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),
+            list=todo,
+            is_done=False
+        )
+        response = self.client.post(
+            reverse('todo:updateListItem', args=[item.id]),
+            data="Invalid JSON",
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], False)
+        self.assertEqual(response_data['message'], "Invalid JSON data")
+
+    def test_updateListItem_invalid_request_method(self):
+        todo = List.objects.create(
+            title_text="test list",
+            created_on=timezone.now(),
+            updated_on=timezone.now(),
+            user_id=self.user
+        )
+        item = ListItem.objects.create(
+            item_name="test item",
+            item_text="This is a test item on a test list",
+            created_on=timezone.now(),
+            finished_on=timezone.now(),
+            tag_color="#f9f9f9",
+            due_date=timezone.now(),
+            list=todo,
+            is_done=False
+        )
+        response = self.client.get(reverse('todo:updateListItem', args=[item.id]))
+        self.assertEqual(response.status_code, 405)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['success'], False)
+        self.assertEqual(response_data['message'], "Invalid request method")

@@ -23,6 +23,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
+from django.utils.safestring import mark_safe
 
 
 # Render the home page with users' to-do lists
@@ -68,6 +69,21 @@ def index(request, list_id=0):
     cur_date = datetime.date.today()
     for list_item in latest_list_items:       
         list_item.color = "#FF0000" if cur_date > list_item.due_date else "#000000"
+    
+    # Filter ListItems by lists belonging to the logged-in user
+    user = request.user
+    user_lists = List.objects.filter(user_id=user)
+    user_list_items = ListItem.objects.filter(list__in=user_lists)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
             
     context = {
         'latest_lists': latest_lists,
@@ -75,6 +91,7 @@ def index(request, list_id=0):
         'templates': saved_templates,
         'list_tags': list_tags,
         'shared_list': shared_list,
+        'calendar_events': mark_safe(json.dumps(calendar_events))
     }
     return render(request, 'todo/index.html', context)
 
@@ -179,23 +196,35 @@ def updateListItem(request, item_id):
     if not request.user.is_authenticated:
         return redirect("/login")
     if request.method == 'POST':
-        updated_text = request.POST['note']
-        # print(request.POST)
-        print(updated_text)
-        print(item_id)
-        if item_id <= 0:
-            return redirect("index")
         try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            updated_text = data.get('note')
+
+            if not updated_text:
+                return JsonResponse({"success": False, "message": "Note content is missing"}, status=400)
+
+            if item_id <= 0:
+                return JsonResponse({"success": False, "message": "Invalid item ID"}, status=400)
+
+            # Update the item in the database within a transaction
             with transaction.atomic():
                 todo_list_item = ListItem.objects.get(id=item_id)
                 todo_list_item.item_text = updated_text
                 todo_list_item.save(force_update=True)
+
+            # Return a JSON response indicating success
+            return JsonResponse({"success": True, "message": "Note updated successfully"})
+
+        except ListItem.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Item not found"}, status=404)
         except IntegrityError as e:
             print(str(e))
-            print("unknown error occurs when trying to update todo list item text")
-        return redirect("/")
+            return JsonResponse({"success": False, "message": "Database error occurred"}, status=500)
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Invalid JSON data"}, status=400)
     else:
-        return redirect("index")
+        return JsonResponse({"success": False, "message": "Invalid request method"}, status=405)
 
 
 # Add a new to-do list item, called by javascript function
@@ -538,7 +567,9 @@ from django.db.models import Count
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.utils import timezone
 from collections import defaultdict
-from .models import ListItem, List
+from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 import datetime
 
 
@@ -551,7 +582,7 @@ def user_analytics(request):
     user_lists = List.objects.filter(user_id=user)
     user_list_items = ListItem.objects.filter(list__in=user_lists)
 
-    # Total tasks
+    # Total tasks and overdue calculations
     total_tasks = user_list_items.count()
     overdue_tasks = user_list_items.filter(due_date__lt=today, is_done=False).count()
     overdue_percentage = (overdue_tasks / total_tasks * 100) if total_tasks > 0 else 0
@@ -578,33 +609,42 @@ def user_analytics(request):
         'counts': [item['count'] for item in monthly_completions]
     }
 
+    # Procrastination and completion time metrics
     total_procrastination_hours = 0
     procrastination_count = 0
+    total_completion_time = 0
+    completion_count = 0
 
-    for item in user_list_items:
-        if item.is_done and item.due_date and item.finished_on:
-            # Convert due_date to an aware datetime object
+    # Iterate only over tasks with both created_on and finished_on dates for completion time
+    for item in user_list_items.filter(is_done=True, finished_on__isnull=False, created_on__isnull=False):
+        # Procrastination calculation
+        if item.due_date:
             due_date = timezone.make_aware(
                 datetime.datetime.combine(item.due_date, datetime.datetime.min.time())
             ) if isinstance(item.due_date, datetime.date) else item.due_date
-
-            # Calculate procrastination in hours
             procrastination_duration = (item.finished_on - due_date).total_seconds() / 3600
-            if procrastination_duration > 0:  # Count only if the task was completed late
+            if procrastination_duration > 0:
                 total_procrastination_hours += procrastination_duration
                 procrastination_count += 1
 
+        # Completion time calculation
+        print(f"Task {item.id}: created_on = {item.created_on}, finished_on = {item.finished_on}")
+        completion_time = (item.finished_on - item.created_on).total_seconds() / 3600
+        total_completion_time += completion_time
+        completion_count += 1
+
+    # Calculate averages, ensuring non-zero denominators
     avg_procrastination_hours = total_procrastination_hours / procrastination_count if procrastination_count > 0 else 0
+    avg_completion_time_hours = total_completion_time / completion_count if completion_count > 0 else 0
 
+    # Task density for busy days
     tasks_per_day = defaultdict(int)
-
     for item in user_list_items:
         if item.due_date:
             tasks_per_day[item.due_date] += 1
 
-    # Create a dictionary to hold the category for each day
+    # Classify busy days
     busy_days = {}
-
     for due_date, count in tasks_per_day.items():
         if count >= 5:
             busy_days[due_date] = 'Very Busy'
@@ -615,6 +655,17 @@ def user_analytics(request):
         else:
             busy_days[due_date] = 'Not Busy'
     print(busy_days)
+
+    # Calendar events based on user's tasks with a due date
+    calendar_events = [
+        {
+            "title": item.item_name,
+            "start": item.due_date.strftime('%Y-%m-%d'),
+            "end": item.due_date.strftime('%Y-%m-%d')  # Optional end date
+        }
+        for item in user_list_items if item.due_date
+    ]
+
     context = {
         'list_items': user_list_items,
         'daily_data': daily_data,
@@ -625,9 +676,11 @@ def user_analytics(request):
         'completed_count': user_list_items.filter(is_done=True).count(),
         'overdue_percentage': overdue_percentage,
         'avg_procrastination_hours': avg_procrastination_hours,
+        'avg_completion_time_hours': avg_completion_time_hours,
         'busy_days': busy_days,
         'today': today,
-        'due_soon_items': due_soon_items  
+        'calendar_events': mark_safe(json.dumps(calendar_events)),
+        'due_soon_items': due_soon_items  # Add due soon items for alert
     }
 
     return render(request, 'todo/user_analytics.html', context)
