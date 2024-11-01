@@ -33,7 +33,8 @@ class ListItem(models.Model):
     is_done = models.BooleanField(default=False)
     created_on = models.DateTimeField()
     list = models.ForeignKey(List, on_delete=models.CASCADE)
-    finished_on = models.DateTimeField()
+    # finished_on = models.DateTimeField()
+    finished_on = models.DateTimeField(null=True, blank=True)
     due_date = models.DateField()
     tag_color = models.CharField(max_length=10)
 
