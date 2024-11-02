@@ -1,47 +1,20 @@
-name: Django CI and Code Quality
+name: Pylint
 
-on:
-  push:
-    branches:
-      - "main"
-      - "harshvardhan"
-  pull_request:
-    branches: [ "main" ]
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.8, 3.9]  # Test against multiple Python versions
-
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
+        python-version: "3.10"
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install autopep8 pytest pylint pylint-django  # Include Django-specific pylint
-    - name: Set PYTHONPATH
-      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src:$(pwd)/tests" >> $GITHUB_ENV
-    - name: Run Linting
+        pip install pylint
+    - name: Analysing the code with pylint
       run: |
-        pylint todo/  # Change "myapp/" to the directory or file you want to lint
-    - name: Run Tests
-      run: |
-        coverage run manage.py test  # Run Django tests
-        coverage lcov -o coverage.lcov
-    - name: Run autopep8
-      run: |
-        autopep8 --in-place --aggressive --aggressive TaskMasterPro/.github/workflows/django.yml  # Format specific file
-    - name: Upload Coverage to Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.lcov
-        parallel: true
+        pylint --fail-under=2 src
