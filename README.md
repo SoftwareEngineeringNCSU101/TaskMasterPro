@@ -90,23 +90,23 @@ TaskMasterPro stands out as a functional, efficient to-do app that integrates es
  * Open your browser at http://127.0.0.1:8080 to explore TaskMasterPro.
 
 ## Documentation
-Explore the full documentation [here](https://chloe-ku.github.io/smart-todo/) for details on installation, usage, and API options.
+Explore the full documentation [here](https://drive.google.com/file/d/1dTMPA3Mq1Ou7XR9jDfKYhGOni98FMxIN/view) for details on installation, usage, and API options.
 
 ## Features
 
 ### Register
 <p float="middle">
-    <img src="img/register.jpg" width="500" height="250" />
+    <img src="img/register.png" width="500" height="250" />
 </p>
 
 ### Login, Forget Password
 <p float="middle">
-    <img src="img/login.jpg" width="500" height="250" /> 
+    <img src="img/login.png" width="500" height="250" /> 
 </p>
 
 ### Manage Todo List
 <p float="middle">
-    <img src="img/main.jpg" width="500" height="250" />
+    <img src="img/main.png" width="500" height="250" />
     <br>
     
 </p>
