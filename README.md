@@ -11,6 +11,7 @@
 [![Django 4.1](https://img.shields.io/badge/django-4.1-blue.svg)](https://docs.djangoproject.com/en/4.1/releases/4.1/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7155415.svg)](https://doi.org/10.5281/zenodo.7155415)
 [![GitHub Release](https://img.shields.io/badge/release-v1.0.1.1-blue)](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/releases/tag/v2.0)
+[![Lint Python](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/actions/workflows/pylint.yml/badge.svg)](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/actions/workflows/pylint.yml)
 
 ## TaskMaster
 
