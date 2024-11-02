@@ -1,163 +1,144 @@
 <p align="center">
   <img src="img/todone-logo.png" />
 </p>
-<h2 align="center">The Only Todo List You Need</h2>
 
-[![Build Status](https://github.com/Chloe-Ku/smart-todo/actions/workflows/django.yml/badge.svg)](https://github.com/Chloe-Ku/smart-todo/actions/workflows/django.yml)
-[![Coverage Status](https://coveralls.io/repos/github/Chloe-Ku/smart-todo/badge.svg?branch=main)](https://coveralls.io/github/Chloe-Ku/smart-todo?branch=main)
-[![license badge](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/Chloe-Ku/smart-todo/blob/main/LICENSE)
-[![issues badge](https://img.shields.io/github/issues/Chloe-Ku/smart-todo)](https://github.com/Chloe-Ku/smart-todo/issues)
+# The Only Todo List You Need
+
+[![Build Status](https://github.com/Chloe-Ku/smart-todo/actions/workflows/django.yml/badge.svg)](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/actions/workflows/django.yml)
+[![license badge](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/blob/main/LICENSE.md)
+[![issues badge](https://img.shields.io/github/issues/Chloe-Ku/smart-todo)](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/issues)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Django 4.1](https://img.shields.io/badge/django-4.1-blue.svg)](https://docs.djangoproject.com/en/4.1/releases/4.1/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7155415.svg)](https://doi.org/10.5281/zenodo.7155415)
 
-# TO-DONE
+## TaskMaster
 
-`to-done` lets you manage your todo list effectively with minimal effort. With a minimalistic web interface, 
-you can access your todolist on the go. Use our rich library of templates to create a new todo list very fast or create your own.
+TaskMasterPro is a powerful, easy-to-use, and flexible to-do list application designed for busy professionals, students, and anyone looking to stay organized. With a sleek web interface, you can manage your tasks from any device. Access a comprehensive library of templates to get started quickly or customize your list to fit specific needs. With innovative features like shared lists, intelligent task analysis, and real-time alerts, you’ll never miss a deadline again!
 
-### Watch this video to know more about TO-DONE 2.0
+### Watch this video to know more about TaskMasterPro 2.0
 
-
-https://user-images.githubusercontent.com/23623764/205810552-556e0449-3f81-4e55-ad9a-414de9731b15.mp4
+https://drive.google.com/file/d/16slSsPs1yCkgR6VO1seG3Fy4EdmboAFv/view?usp=sharing
 
 
-### Watch this video to know more about the original TO-DONE 
+### Watch below video to know more about the original TaskMasterPro
+
 <img src="img/todone-create-list.gif" width="1200" height="500" />
 
-Contents
-========
+## Contents
 
  * [Why?](#why)
  * [Features](#key-features-last-version)
  * [New Features](#new-features)
  * [Upcoming Features](#upcoming-features)
  * [Quick Start](#quick-start)
- * [Documentation](#Documentation)
+ * [Documentation](#documentation)
  * [Want to contribute?](#want-to-contribute)
  * [License](#license)
- * [Developer](#developers-new-version)
+ * [Developers](#developers-new-version)
 
-### Why?
+## Why?
 
-We wanted to work on something that is:
+We aimed to build something that meets the following criteria:
 
-+ Useful, serves some real purpose
-+ Easy to start with a basic working version and lends itself to adding new features incrementally to it
-+ Easily divisible in modules/features/tasks that can be parallely done by five developers 
-+ Diverse enough so that a lot of Software Engineering practices is required/involved 
++ *Purposeful*: An app that fulfills a real need in task management, offering unique tools for productivity.
++ *Scalable*: Designed to work efficiently with a core set of features and expand easily with new functionalities.
++ *Collaborative*: TaskMasterPro's modular structure allows for contributions from multiple developers simultaneously, encouraging teamwork and seamless integration of new features.
++ *Comprehensive*: A project that leverages key Software Engineering practices, from web development and database management to UI/UX design and agile project management.
 
-`to-done` is a todo list app that is actually useful, very easy to create a basic working version with where a ton of new features can be added, touches upon all the aspects of web programming, database, working in a team etc.
+TaskMasterPro stands out as a functional, efficient to-do app that integrates essential web technologies and practices, all while fostering a productive and collaborative environment.
 
-### Key Features (Last Version)
- * [Register](#register)
- * [Login](#login-forget-password)
- * [Create, Update, Delete Todo Lists](#manage-todo-list)
- * [Quickly Create Todo Lists From Existing Templates](#templates)
- * [Create Your Own Templates](#templates)
+## Key Features (Last Version)
+ * *Register*: Create an account to save and manage your to-do lists across devices.
+ * *Login*: Log in securely to access your lists and settings from any device. 
+ * *Create, Update, Delete Todo Lists*: Add, modify, or remove lists with a simple interface.
+ * *Quickly Create Todo Lists From Templates*: Select from predefined templates to quickly build structured lists.
+ * *Custom Templates*: Save time by creating reusable templates tailored to your needs.
+ * *Shared List*: Collaborate with others by sharing specific lists for joint task management.
+ * *Due Date and Color Tagging*: Assign due dates and color-coded tags to tasks for better organization and urgency recognition.
+ * *Tag-based Grouping*: Use customizable tags to group and organize tasks, projects, or lists.
 
-### New Features
-* [Shared List](#shared-todo-lists)
-* [Add Due Date To Tasks](#due-date-color-tags)
-* [Due Date Alerting Mechanism](#due-date-color-tags)
-* [Add Reminder Message to task completed](#due-date-color-tags)
-* [Customized Color Tag](#due-date-color-tags)
-* [Add Tags To Todo Lists For Customizable Grouping](#customizable-grouping-tags)
+## New Features
 
-### Upcoming Features
- * Social login
- * Export and import to-do lists
- * Gamification - earn points by finishing your tasks, show-off your productivity in social media
- * [List of All Planned Features for Second Phase](https://github.com/users/shahleon/projects/2/views/6)
+* *User Productivity Analysis*: Get insights into your productivity trends over time.
+* *Task Analysis*: View detailed analytics on task completion, pending tasks, and more.
+* *Customized Color Tags*: Personalize tags for a more visual, engaging to-do list experience.
+* *Due Date Alerting Mechanism*: Receive timely alerts for upcoming or overdue tasks.
+* *Advanced Scheduler*: Plan tasks with complex scheduling options for improved time management.
+* *Calendar Dashboard*: Visualize tasks and deadlines on a calendar to track deadlines and progress effectively.
 
-### Quick Start
+## Upcoming Features
+* *Task Cloning for Repeatable Routines*: Add a "Clone Task" option for quick duplication of recurring tasks with similar settings.
+* *Quick Task Ratings*: Prompt users to rate tasks on importance, ease, and satisfaction after completion for personalized insights.
+* *AI-Driven Next Task Suggestion*: Recommend the next best task based on urgency, priority, and user preferences.
+* *Daily Focus Theme*: Set daily themes (e.g., "Wellness Wednesdays") to help users concentrate on specific task types.
+* *Gamified Achievements and Badges*: Reward users with badges like "Task Streaker" and "Deadline Conqueror" for motivational milestones.
+## Quick Start
 
- * [Download](https://www.python.org/downloads/release/python-380/) and install Python 3.8.0 or higher
- * [Install](https://docs.djangoproject.com/en/4.1/topics/install/) Django 4.1
- * Clone the repository
-    ```bash
-    $ git clone git@github.com:Chloe-Ku/smart-todo.git
-    ```
- * Run migrations
-    ```bash
+ * [Download](https://www.python.org/downloads/release/python-380/) and install Python 3.8.0 or higher.
+ * [Install](https://docs.djangoproject.com/en/4.1/topics/install/) Django 4.1.
+ * Clone the repository:
+    bash
+    $ git clone https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro.git
+    
+ * Run migrations:
+    bash
     $ python manage.py migrate
-    ```
- * Start the app
-    ```bash
+    
+ * Start the app:
+    bash
     $ python manage.py runserver 8080
-    ```
- * Point your browser at http://127.0.0.1:8080 and explore the app
+    
+ * Open your browser at http://127.0.0.1:8080 to explore TaskMasterPro.
 
-### Documentation
-[See this page](https://chloe-ku.github.io/smart-todo/)
+## Documentation
+Explore the full documentation [here](https://chloe-ku.github.io/smart-todo/) for details on installation, usage, and API options.
 
-### Features
+## Features
 
-#### Register
+### Register
 <p float="middle">
-    <img src="img/todone-register.gif" width="500" height="250" />
+    <img src="img/register.jpg" width="500" height="250" />
 </p>
 
-#### Login, Forget Password
+### Login, Forget Password
 <p float="middle">
-    <img src="img/todone-login.gif" width="500" height="250" /> 
+    <img src="img/login.jpg" width="500" height="250" /> 
 </p>
 
-#### Manage Todo List
+### Manage Todo List
 <p float="middle">
-    <img src="img/todone-create-list.gif" width="500" height="250" />
+    <img src="img/main.jpg" width="500" height="250" />
     <br>
-    <br>
-    <img src="img/todone-update-list.gif" width="500" height="250" />
+    
 </p>
 
-#### Templates
+
+### User Analytics
 <p float="middle">
-    <img src="img/todone-templates.gif" width="500" height="250" />
+    <img src="img/analytics.gif" width="500" height="250" />
 </p>
 
-### New Features
-#### Customizable Grouping Tags
-<p float="middle">
-    <img src="img/todone-tag-list.gif" width="500" height="250" />
-</p>
+## Want to Contribute?
 
-#### Shared ToDo Lists
-<p float="middle">
-    <img src="img/todone-shared-list.gif" width="500" height="250" />
-</p>
+Interested in contributing? See our [Contributing Guide](CONTRIBUTING.md) for ways to get started. Not sure where to start? Check out our [good first issues](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/issues/4) or open an [Issue](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/issues) to let us know your ideas or report any bugs.
 
-#### Due Date, Color Tags
-<p float="middle">
-    <img src="img/todone-tag-color.gif" width="500" height="250" />
-</p>
+## License
 
+This project is licensed under the MIT License. For more details, view the [LICENSE](https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro/blob/main/LICENSE) file.
 
-### Want to Contribute?
-
-Want to contribute to this project? Learn about [Contributing](CONTRIBUTING.md). Not sure where to start? Have a look at 
-the [good first issue](https://github.com/shahleon/smart-todo/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22). Found a bug or have a new feature idea? Please create an [Issue](https://github.com/Chloe-Ku/smart-todo/issues) to notify us.
-
-### License
-
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
-
-### Developers (New Version)
+## Developers (New Version)
 
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/juliachiu1"><img src="https://avatars.githubusercontent.com/u/112150278?v=4" width="100px;" alt=""/><br /><sub><b>Chiu, Ching-Lun</b></sub></a></td>
-    <td align="center"><a href="https://github.com/Hsueh-YANG"><img src="https://avatars.githubusercontent.com/u/23623764?v=4" width="100px;" alt=""/><br /><sub><b>Yu, Hsueh-Yang</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/123standup"><img src="https://avatars.githubusercontent.com/u/59056739?v=4" width="100px;" alt=""/><br /><sub><b>Lin, Po-Hsun</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/Chloe-Ku"><img src="https://avatars.githubusercontent.com/u/60029373?v=4" width="100px;" alt=""/><br /><sub><b>Ku, Li-Ling</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/jackson910210"><img src="https://avatars.githubusercontent.com/u/32348727?v=4" width="100px;" alt=""/><br /><sub><b>Chiang, Chen-Hsuan</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/dineshkannan010"><img src="https://avatars.githubusercontent.com/u/112150278?v=4" width="100px;" alt=""/><br /><sub><b>Dinesh Kannan</b></sub></a></td>
+    <td align="center"><a href="https://github.com/Harshvardhan14"><img src="https://avatars.githubusercontent.com/u/23623764?v=4" width="100px;" alt=""/><br /><sub><b>Harshvardhan Patil</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/SakshiPhatak"><img src="https://avatars.githubusercontent.com/u/59056739?v=4" width="100px;" alt=""/><br /><sub><b>Sakshi Phatak</b></sub></a><br /></td>
+
   </tr>
 </table>
 
-### Developers (Last Version)
+## Developers (Last Version)
 
 * Shahnewaz Leon (sleon3@ncsu.edu)
 * Dong Li (dli35@ncsu.edu)
 * Cheng-Yun Kuo (ckuo3@ncsu.edu)
 * Drew Commings (docummin@ncsu.edu)
-* Janet Brock (jdbrock@ncsu.edu)

@@ -1,11 +1,11 @@
 ```
-@CS510 GROUP34 HW1 {
-    Smart-Todo(PYTHON), 
-    author = {Shahnewaz Leon, Janet Brock, Drew Cummings, Dong Li, Cheng-Yun Kuo},
+@CS510 GROUP74 P2 {
+    TaskMasterPro(PYTHON), 
+    author = {Sakshi Phatak, Harshvardhan Patil, Dinesh Kannan},
     doi = {},
     month = {10},
-    title = {{GROUP34 Project1}},
-    url = {https://github.com/shahleon/smart-todo},
-    version = {1.0.0}, year = {2022} 
+    title = {{GROUP74 Project2}},
+    url = {https://github.com/SoftwareEngineeringNCSU101/TaskMasterPro},
+    version = {1.0.0}, year = {2024} 
 }
 ```
