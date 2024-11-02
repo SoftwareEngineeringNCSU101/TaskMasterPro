@@ -969,79 +969,75 @@ listItemsCheckBoxes.forEach(function(checkbox) {
 // Create a new list item when clicking on the "Add" button
 function newElement(list_id, saved_to_database = true) {
     var li = document.createElement("li");
-    {#var inputBox = document.getElementById(list_id).parentElement.getElementsByTagName("input")[0]#}
     var inputBox = document.getElementById("InputText_" + list_id.toString());
     var inputValue = inputBox.value;
     var inputDue = document.getElementById("InputDue_" + list_id.toString()).value;
     var inputColor = document.getElementById("InputColor_" + list_id.toString()).value;
-    // var unorderedList = inputBox.parentElement.nextElementSibling
 
-    {#var list_html_tag_id =  #}
 
     li.className = "listItem";
     if (inputValue === '') {
         alert("You must write something!");
-    }
-    else if (inputDue === '') {
-        alert("You must enter due date!")
-    }
-    // else {
-    //     unorderedList.appendChild(li);
-    // }
-    inputBox.value = "";
+    } else if (inputDue === '') {
+        alert("You must enter due date!");
+    } else {
+        inputBox.value = "";
+        
+        // Saved to database if saved_to_database is true
+        if (saved_to_database && inputValue !== '') {
+            var httpRequest = new XMLHttpRequest();
+            var today = new Date();
+            var create_on_timestamp = today.getTime() / 1000;
+            console.log("Timestamp for creation:", create_on_timestamp);
 
-    // Saved to database if saved_to_database is true
-    if(saved_to_database && inputValue !== '') {
-        var httpRequest = new XMLHttpRequest()
-        var today = new Date()
-        var create_on_timestamp = today.getTime() / 1000
-        httpRequest.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                // get the newly created item's id and set it as the id of the html tag
-                // add checkbox element
-                var jsonResponse = JSON.parse(this.responseText)
-                var itemCheckBox = document.createElement("input")
-                itemCheckBox.type = "checkbox"
-                // id and name should be unique, currently I set it to be list_name + item_name
-                var itemValue = "ListItem_" + jsonResponse['item_id']
-                itemCheckBox.id = itemValue
-                itemCheckBox.name = itemValue
-                itemCheckBox.value = itemValue
-                itemCheckBox.addEventListener('change', markListItemByName)
+            httpRequest.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    console.log("HTTP Request completed with status:", this.status);
+                    if (this.status === 200) {
+                        console.log("Response received:", this.responseText);
 
-                var itemLabel = document.createElement("label")
-                itemLabel.htmlFor  = itemValue
-                itemLabel.innerHTML = inputValue
-                li.append(itemCheckBox)
-                li.append(itemLabel)
+                        var jsonResponse = JSON.parse(this.responseText);
+                        var itemCheckBox = document.createElement("input");
+                        itemCheckBox.type = "checkbox";
+                        var itemValue = "ListItem_" + jsonResponse['item_id'];
+                        itemCheckBox.id = itemValue;
+                        itemCheckBox.name = itemValue;
+                        itemCheckBox.value = itemValue;
+                        itemCheckBox.addEventListener('change', markListItemByName);
 
-                var span = document.createElement("SPAN");
-                var txt = document.createTextNode("\u00D7");
-                span.className = "close";
-                span.onclick = removeListItem
-                span.appendChild(txt);
-                li.appendChild(span);
-            }
-        };
-        httpRequest.open('POST', '/addNewListItem');
-        httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8")
-        var params = {
-            "list_id": list_id,
-            "list_item_name": inputValue,
-            "create_on": create_on_timestamp,
-            "due_date": inputDue,
-	        "tag_color": inputColor
+                        var itemLabel = document.createElement("label");
+                        itemLabel.htmlFor = itemValue;
+                        itemLabel.innerHTML = inputValue;
+                        li.append(itemCheckBox);
+                        li.append(itemLabel);
+
+                        var span = document.createElement("SPAN");
+                        var txt = document.createTextNode("\u00D7");
+                        span.className = "close";
+                        span.onclick = removeListItem;
+                        span.appendChild(txt);
+                        li.appendChild(span);
+                    } else {
+                        console.error("Error in HTTP Request. Status:", this.status);
+                    }
+                }
+            };
+
+            httpRequest.open('POST', '/addNewListItem');
+            httpRequest.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
+
+            var params = {
+                "list_id": list_id,
+                "list_item_name": inputValue,
+                "create_on": create_on_timestamp,
+                "due_date": inputDue,
+                "tag_color": inputColor
+            };
+
+            httpRequest.send(JSON.stringify(params));
         }
-        httpRequest.send(JSON.stringify(params))
+        window.location.reload();
     }
-    window.location.reload();
-    {#else {#}
-    {#    return#}
-    {#}#}
-
-    {#for (i = 0; i < close.length; i++) {#}
-    {#    close[i].onclick = removeListItem#}
-    {#}#}
 }
 
 function newTodoList() {
@@ -1059,6 +1055,7 @@ function newTodoList() {
     }
     var listTag = selectedTag==='new'? document.getElementById("newListTag").value : selectedTag;
     var inputValue = leftSideBar.value
+    console.log(inputValue)
     if (inputValue === '') {
         alert("You must write something!")
     }
