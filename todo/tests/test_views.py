@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth.models import User
-from todo.views import login_request, template_from_todo, template, delete_todo, index, getListTagsByUserid, removeListItem, addNewListItem, updateListItem, createNewTodoList, register_request, getListItemByName, getListItemById, markListItem, todo_from_template
+from todo.views import login_request, template_from_todo, template, delete_todo, index, get_list_tags_by_userid, remove_list_item, add_new_list_item, update_list_item, create_new_todo_list, register_request, get_list_item_by_name, get_list_item_by_id, mark_list_item, todo_from_template
 from django.utils import timezone
 from todo.models import List, ListItem, Template, TemplateItem, ListTags, SharedList
 from todo.forms import NewUserForm
@@ -70,7 +70,7 @@ class TestViews(TestCase):
         post['todo'] = 1
         request.POST = post
         request.method = "POST"
-        response = getListTagsByUserid(request)
+        response = get_list_tags_by_userid(request)
         print('response:')
         print(response)
         self.assertIsNotNone(response)
@@ -156,7 +156,7 @@ class TestViews(TestCase):
         # post['list_item_id'] = 1
         request.method = "POST"
         request._body = json.dumps({ "list_item_id": 1 }).encode('utf-8')
-        response = removeListItem(request)
+        response = remove_list_item(request)
         print(response)
         self.assertIsNotNone(response)
         
@@ -192,7 +192,7 @@ class TestViews(TestCase):
         print(type(params))
         # param = json.dumps(param,cls=DateTimeEncoder)
         # request._body = json.dumps(params, separators=(',', ':')).encode('utf-8')
-        temp = addNewListItem(request)
+        temp = add_new_list_item(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
         
@@ -206,7 +206,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=test_data, 
                                 content_type="application/json")
         request.user = self.user
-        temp = createNewTodoList(request)
+        temp = create_new_todo_list(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
         
@@ -233,7 +233,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=test_data,
                                 content_type="application/json")
         request.user = self.user
-        response = getListItemByName(request)
+        response = get_list_item_by_name(request)
         self.assertEqual(response.status_code, 200)
     
     def test_getListItemById(self):
@@ -260,7 +260,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=test_data, 
                                 content_type="application/json")
         request.user = self.user
-        temp = getListItemById(request)
+        temp = get_list_item_by_id(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
         
@@ -296,7 +296,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=params, 
                                 content_type="application/json")
         request.user = self.user
-        temp = markListItem(request)
+        temp = mark_list_item(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
     
@@ -309,7 +309,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=test_data, 
                                 content_type="application/json")
         request.user = self.user
-        temp = createNewTodoList(request)
+        temp = create_new_todo_list(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
     
@@ -329,7 +329,7 @@ class TestViews(TestCase):
         request = self.factory.post(f'/todo/', data=test_data, 
                                 content_type="application/json")
         request.user = self.user
-        temp = createNewTodoList(request)
+        temp = create_new_todo_list(request)
         response = index(request)
         self.assertEqual(response.status_code, 200)
         
